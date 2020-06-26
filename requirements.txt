@@ -1,0 +1,4 @@
+torch+cpu -f https://download.pytorch.org/whl/torch_stable.html
+ray
+ray[rllib]
+minerl
