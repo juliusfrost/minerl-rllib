@@ -4,13 +4,13 @@ import ray
 import minerl
 from ray import tune
 # from ray.rllib.agents import a3c
-from ray.tune.registry import register_env
+# from ray.tune.registry import register_env
 # from ray.tune.logger import pretty_print
 
 import register_env
 
 env_name = "MineRLObtainDiamondDenseVectorObf-v0"
-offline_path = os.path.join(os.environ['MINERL_DATA_ROOT'], 'rllib', env_name, '*.json')
+# offline_path = os.path.join(os.environ['MINERL_DATA_ROOT'], 'rllib', env_name, '*.json')
 
 ray.init()
 tune.run(
@@ -18,7 +18,7 @@ tune.run(
     stop={"time_total_s": int(60 * 60 * 2)},
     config={
         "env": env_name,
-        "input": {"sampler": 0.5, offline_path: 0.5},
+#         "input": {"sampler": 0.5, offline_path: 0.5},
 #         "input_evaluation": ["simulation"],
         "explore": False,
         "num_gpus": 1,
