@@ -7,10 +7,16 @@ RLlib natively supports TensorFlow, TensorFlow Eager, and PyTorch, but most of i
 
 ## Installation
 
+OS: Linux (waiting on ray Windows support)
+
+Make sure you have JDK 1.8 on your system for MineRL.
+
 Install [PyTorch](https://pytorch.org/get-started/locally/) and [TensorFlow](https://www.tensorflow.org/install) with correct cuda version, then
 `pip install -r requirements.txt`
 
 ## Experiments
+
+Currently experiments do not support headless mode.
 
 ### SAC [WIP]
 
