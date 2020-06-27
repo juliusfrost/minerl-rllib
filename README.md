@@ -28,5 +28,5 @@ This is the standard reinforcement learning agent-environment loop.
 As human demonstrations available in MineRL, it is possible to increase sample efficiency by using them to learn a better policy. 
 This section is dedicated to offline sampling from the dataset only and does not sample from the environment.
 
-#### Mixed: Online Reinforcement Learning with Offline Data [TODO]
+### Mixed: Online Reinforcement Learning with Offline Data [TODO]
 One can try to get the best of both worlds of online and offline RL, by learning when data is already available and sampling for exploration. 
