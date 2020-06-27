@@ -16,6 +16,8 @@ Install [PyTorch](https://pytorch.org/get-started/locally/) and [TensorFlow](htt
 
 ## Experiments
 
+See [Planned Implementation Details](Implementation.md)
+
 Currently experiments do not support headless mode.
 
 ### Online Reinforcement Learning [WIP]
