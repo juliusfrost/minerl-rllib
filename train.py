@@ -41,7 +41,8 @@ def main():
 
     config = algo_config['config']
     config.update(dict(
-        framework=args.framework
+        framework=args.framework,
+        env=args.env,
     ))
 
     if args.mode == 'offline':
