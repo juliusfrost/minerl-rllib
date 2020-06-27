@@ -22,9 +22,8 @@ Currently experiments do not support headless mode.
 
 ### Online Reinforcement Learning [WIP]
 This is the standard reinforcement learning agent-environment loop.
-#### SAC [WIP]
 
-`python tune.py`
+`python train.py --mode=online`
 
 ### Offline Reinforcement Learning [TODO]
 As human demonstrations available in MineRL, it is possible to increase sample efficiency by using them to learn a better policy. 
