@@ -27,14 +27,16 @@ class MineRLActionWrapper(gym.ActionWrapper):
 
 for env_spec in minerl.herobraine.envs.ENVS:
     def env_creator(env_config):
-        kwargs = dict(
-            observation_space=env_spec.observation_space,
-            action_space=env_spec.action_space,
-            docstr=env_spec.get_docstring(),
-            xml=os.path.join(minerl.herobraine.env_spec.MISSIONS_DIR, env_spec.xml),
-            env_spec=env_spec,
-        )
-        env = minerl.env.MineRLEnv(**kwargs)
+        # kwargs = dict(
+        #     observation_space=env_spec.observation_space,
+        #     action_space=env_spec.action_space,
+        #     docstr=env_spec.get_docstring(),
+        #     xml=os.path.join(minerl.herobraine.env_spec.MISSIONS_DIR, env_spec.xml),
+        #     env_spec=env_spec,
+        # )
+        # env = minerl.env.MineRLEnv(**kwargs)
+        import minerl
+        env = gym.make(env_spec.name)
         env = MineRLActionWrapper(MineRLObservationWrapper(env))
         return env
 
