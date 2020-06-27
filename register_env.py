@@ -2,6 +2,27 @@ import os
 import gym
 import minerl
 from ray.tune.registry import register_env
+from ray.rllib.env.external_env import ExternalEnv
+
+
+class MineRL(ExternalEnv):
+    def __init__(self, env_config: dict):
+        import minerl
+        env = gym.make(env_config['name'])
+        env = MineRLActionWrapper(MineRLObservationWrapper(env))
+        self.env = env
+        super().__init__(self.env.action_space, self.env.observation_space, max_concurrent=1)
+
+    def run(self):
+        while True:
+            episode_id = self.start_episode()
+            obs = self.env.reset()
+            done = False
+            while not done:
+                action = self.get_action(episode_id, obs)
+                obs, reward, done, info = self.env.step(action)
+                self.log_returns(episode_id, reward, info)
+            self.end_episode(episode_id, obs)
 
 
 class MineRLObservationWrapper(gym.ObservationWrapper):
@@ -27,17 +48,8 @@ class MineRLActionWrapper(gym.ActionWrapper):
 
 for env_spec in minerl.herobraine.envs.ENVS:
     def env_creator(env_config):
-        # kwargs = dict(
-        #     observation_space=env_spec.observation_space,
-        #     action_space=env_spec.action_space,
-        #     docstr=env_spec.get_docstring(),
-        #     xml=os.path.join(minerl.herobraine.env_spec.MISSIONS_DIR, env_spec.xml),
-        #     env_spec=env_spec,
-        # )
-        # env = minerl.env.MineRLEnv(**kwargs)
-        import minerl
-        env = gym.make(env_spec.name)
-        env = MineRLActionWrapper(MineRLObservationWrapper(env))
+        env_config.update(dict(name=env_spec.name))
+        env = MineRL(env_config)
         return env
 
 
