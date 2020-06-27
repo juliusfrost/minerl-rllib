@@ -1,6 +1,6 @@
 run: A2C
 config:
-    sample_batch_size: 500
+    rollout_fragment_length: 500
     num_workers: 0
     num_envs_per_worker: 1
     num_gpus: 1
