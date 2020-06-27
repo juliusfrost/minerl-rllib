@@ -18,6 +18,15 @@ Install [PyTorch](https://pytorch.org/get-started/locally/) and [TensorFlow](htt
 
 Currently experiments do not support headless mode.
 
-### SAC [WIP]
+### Online Reinforcement Learning [WIP]
+This is the standard reinforcement learning agent-environment loop.
+#### SAC [WIP]
 
 `python tune.py`
+
+### Offline Reinforcement Learning [TODO]
+As human demonstrations available in MineRL, it is possible to increase sample efficiency by using them to learn a better policy. 
+This section is dedicated to offline sampling from the dataset only and does not sample from the environment.
+
+#### Mixed: Online Reinforcement Learning with Offline Data [TODO]
+One can try to get the best of both worlds of online and offline RL, by learning when data is already available and sampling for exploration. 
