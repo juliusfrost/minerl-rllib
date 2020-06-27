@@ -1,8 +1,8 @@
 run: A2C
 config:
-    sample_batch_size: 20
-    num_workers: 5
-    num_envs_per_worker: 5
+    sample_batch_size: 500
+    num_workers: 0
+    num_envs_per_worker: 1
     num_gpus: 1
     lr_schedule: [
         [0, 0.0007],
