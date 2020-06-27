@@ -4,11 +4,11 @@ config:
     # state-preprocessor=Our default Atari Conv2D-net.
     use_state_preprocessor: true
     Q_model:
-        hidden_activation: relu
-        hidden_layer_sizes: [512]
+        fcnet_activation: relu
+        fcnet_hiddens: [512]
     policy_model:
-        hidden_activation: relu
-        hidden_layer_sizes: [512]
+        fcnet_activation: relu
+        fcnet_hiddens: [512]
     # Do hard syncs.
     # Soft-syncs seem to work less reliably for discrete action spaces.
     tau: 1.0
