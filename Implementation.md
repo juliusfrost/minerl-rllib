@@ -15,7 +15,7 @@
 2. `MineRLObtainDiamondDenseVectorObf-v0`
 
 ### Obtain Iron Pickaxe
-We will ignore this becase it is a task subset of Obtain Diamond.
+We will ignore this because it is a task subset of Obtain Diamond.
 However using this category human data may be valuable.
 1. `MineRLObtainIronPickaxeVectorObf-v0`
 2. `MineRLObtainIronPickaxeDenseVectorObf-v0`
