@@ -7,8 +7,8 @@ from ray.rllib.env.external_env import ExternalEnv
 
 class MineRL(minerl.env.MineRLEnv, ExternalEnv):
     def __init__(self, **kwargs):
-        super(minerl.env.MineRLEnv).__init__(**kwargs)
-        super().__init__(self.action_space, self.observation_space, max_concurrent=1)
+        minerl.env.MineRLEnv.__init__(self, **kwargs)
+        ExternalEnv.__init__(self, self.action_space, self.observation_space, max_concurrent=1)
 
     def run(self):
         while True:
