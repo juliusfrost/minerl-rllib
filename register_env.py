@@ -34,7 +34,7 @@ class MineRLRewardPenaltyWrapper(gym.wrappers.TransformReward):
 
 class MineRLTimeLimitWrapper(gym.wrappers.TimeLimit):
     def __init__(self, env):
-        super().__init__(env, env.spec.max_episode_steps)
+        super().__init__(env, env.env_spec.max_episode_steps)
 
 
 def wrap(env):
@@ -44,7 +44,7 @@ def wrap(env):
     return env
 
 
-for env_spec in minerl.herobraine.envs.ENVS:
+for env_spec in minerl.herobraine.envs.obfuscated_envs:
     kwargs = dict(
         observation_space=env_spec.observation_space,
         action_space=env_spec.action_space,
