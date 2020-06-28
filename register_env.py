@@ -1,6 +1,7 @@
 import os
 import gym
 import minerl
+import copy
 from ray.tune.registry import register_env
 from ray.rllib.env.external_env import ExternalEnv
 
@@ -44,17 +45,13 @@ class MineRLActionWrapper(gym.ActionWrapper):
 
 
 for env_spec in minerl.herobraine.envs.ENVS:
-    def env_creator(env_config):
-        kwargs = dict(
-            observation_space=env_spec.observation_space,
-            action_space=env_spec.action_space,
-            docstr=env_spec.get_docstring(),
-            xml=os.path.join(minerl.herobraine.env_spec.MISSIONS_DIR, env_spec.xml),
-            env_spec=env_spec,
-        )
-        env = MineRL(**kwargs)
-        env = MineRLActionWrapper(MineRLObservationWrapper(env))
-        return env
+    kwargs = dict(
+        observation_space=env_spec.observation_space,
+        action_space=env_spec.action_space,
+        docstr=env_spec.get_docstring(),
+        xml=os.path.join(minerl.herobraine.env_spec.MISSIONS_DIR, env_spec.xml),
+        env_spec=env_spec,
+    )
+    env_kwargs = copy.deepcopy(kwargs)
 
-
-    register_env(env_spec.name, env_creator)
+    register_env(env_spec.name, lambda env_config: MineRLActionWrapper(MineRLObservationWrapper(MineRL(**env_kwargs))))
