@@ -38,9 +38,9 @@ class MineRLTimeLimitWrapper(gym.wrappers.TimeLimit):
 
 
 def wrap(env):
+    env = MineRLTimeLimitWrapper(env)
     env = MineRLObservationWrapper(env)
     env = MineRLActionWrapper(env)
-    env = MineRLTimeLimitWrapper(env)
     return env
 
 
