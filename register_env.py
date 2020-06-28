@@ -3,24 +3,6 @@ import gym
 import minerl
 import copy
 from ray.tune.registry import register_env
-from ray.rllib.env.external_env import ExternalEnv
-
-
-class MineRL(minerl.env.MineRLEnv, ExternalEnv):
-    def __init__(self, **kwargs):
-        minerl.env.MineRLEnv.__init__(self, **kwargs)
-        ExternalEnv.__init__(self, self.action_space, self.observation_space, max_concurrent=1)
-
-    def run(self):
-        while True:
-            episode_id = self.start_episode()
-            obs = self.env.reset()
-            done = False
-            while not done:
-                action = self.get_action(episode_id, obs)
-                obs, reward, done, info = self.step(action)
-                self.log_returns(episode_id, reward, info)
-            self.end_episode(episode_id, obs)
 
 
 class MineRLObservationWrapper(gym.ObservationWrapper):
@@ -54,4 +36,5 @@ for env_spec in minerl.herobraine.envs.ENVS:
     )
     env_kwargs = copy.deepcopy(kwargs)
 
-    register_env(env_spec.name, lambda env_config: MineRLActionWrapper(MineRLObservationWrapper(MineRL(**env_kwargs))))
+    register_env(env_spec.name,
+                 lambda env_config: MineRLActionWrapper(MineRLObservationWrapper(minerl.env.MineRLEnv(**env_kwargs))))
