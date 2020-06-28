@@ -1,6 +1,8 @@
 import os
 import gym
+import gym.wrappers
 import minerl
+import copy
 from ray.tune.registry import register_env
 
 
@@ -25,18 +27,31 @@ class MineRLActionWrapper(gym.ActionWrapper):
         return action['vector']
 
 
-for env_spec in minerl.herobraine.envs.ENVS:
-    def env_creator(env_config):
-        kwargs = dict(
-            observation_space=env_spec.observation_space,
-            action_space=env_spec.action_space,
-            docstr=env_spec.get_docstring(),
-            xml=os.path.join(minerl.herobraine.env_spec.MISSIONS_DIR, env_spec.xml),
-            env_spec=env_spec,
-        )
-        env = minerl.env.MineRLEnv(**kwargs)
-        env = MineRLActionWrapper(MineRLObservationWrapper(env))
-        return env
+class MineRLRewardPenaltyWrapper(gym.wrappers.TransformReward):
+    def __init__(self, env, reward_penalty=0.001):
+        super().__init__(env, lambda r: r - reward_penalty)
 
 
-    register_env(env_spec.name, env_creator)
+class MineRLTimeLimitWrapper(gym.wrappers.TimeLimit):
+    def __init__(self, env):
+        super().__init__(env, env.env_spec.max_episode_steps)
+
+
+def wrap(env):
+    env = MineRLTimeLimitWrapper(env)
+    env = MineRLObservationWrapper(env)
+    env = MineRLActionWrapper(env)
+    return env
+
+
+for env_spec in minerl.herobraine.envs.obfuscated_envs:
+    kwargs = dict(
+        observation_space=env_spec.observation_space,
+        action_space=env_spec.action_space,
+        docstr=env_spec.get_docstring(),
+        xml=os.path.join(minerl.herobraine.env_spec.MISSIONS_DIR, env_spec.xml),
+        env_spec=env_spec,
+    )
+    env_kwargs = copy.deepcopy(kwargs)
+
+    register_env(env_spec.name, lambda env_config: wrap(minerl.env.MineRLEnv(**env_kwargs)))

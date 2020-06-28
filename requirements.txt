@@ -1,5 +1,4 @@
-torch+cpu -f https://download.pytorch.org/whl/torch_stable.html
-tensorflow
-ray
-ray[rllib]
+gym
 minerl
+pyyaml
+ray[rllib]
