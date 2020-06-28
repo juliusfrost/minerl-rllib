@@ -1,5 +1,6 @@
 import os
 import gym
+import gym.wrappers
 import minerl
 import copy
 from ray.tune.registry import register_env
@@ -26,6 +27,23 @@ class MineRLActionWrapper(gym.ActionWrapper):
         return action['vector']
 
 
+class MineRLRewardPenaltyWrapper(gym.wrappers.TransformReward):
+    def __init__(self, env, reward_penalty=0.001):
+        super().__init__(env, lambda r: r - reward_penalty)
+
+
+class MineRLTimeLimitWrapper(gym.wrappers.TimeLimit):
+    def __init__(self, env):
+        super().__init__(env, env.spec.max_episode_steps)
+
+
+def wrap(env):
+    env = MineRLObservationWrapper(env)
+    env = MineRLActionWrapper(env)
+    env = MineRLTimeLimitWrapper(env)
+    return env
+
+
 for env_spec in minerl.herobraine.envs.ENVS:
     kwargs = dict(
         observation_space=env_spec.observation_space,
@@ -36,5 +54,4 @@ for env_spec in minerl.herobraine.envs.ENVS:
     )
     env_kwargs = copy.deepcopy(kwargs)
 
-    register_env(env_spec.name,
-                 lambda env_config: MineRLActionWrapper(MineRLObservationWrapper(minerl.env.MineRLEnv(**env_kwargs))))
+    register_env(env_spec.name, lambda env_config: wrap(minerl.env.MineRLEnv(**env_kwargs)))
