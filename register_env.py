@@ -1,8 +1,9 @@
+import copy
 import os
+
 import gym
 import gym.wrappers
 import minerl
-import copy
 from ray.tune.registry import register_env
 
 

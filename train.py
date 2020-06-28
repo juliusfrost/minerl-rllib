@@ -1,8 +1,9 @@
-import os
 import argparse
-import yaml
+import os
 import pprint
+
 import ray
+import yaml
 from ray import tune
 
 import register_env
