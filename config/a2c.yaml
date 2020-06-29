@@ -1,8 +1,10 @@
+# doesn't work because minerl parallelization bugs when `num_workers: 10` and `num_envs_per_worker: 5`
+# doesn't work with `num_workers: 0` and `num_envs_per_worker: 0`
 run: A2C
 config:
     rollout_fragment_length: 20
-    num_workers: 0
-    num_envs_per_worker: 1
+    num_workers: 5
+    num_envs_per_worker: 5
     num_gpus: 1
     lr_schedule: [
         [0, 0.0007],
