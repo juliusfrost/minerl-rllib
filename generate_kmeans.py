@@ -30,8 +30,11 @@ def main():
         data = minerl.data.make(env_name)
         actions = []
         for trajectory_name in tqdm(list(data.get_trajectory_names())):
-            for _, action, _, _, _ in data.load_data(trajectory_name):
-                actions.append(action['vector'])
+            try:
+                for _, action, _, _, _ in data.load_data(trajectory_name):
+                    actions.append(action['vector'])
+            except TypeError:
+                pass
         actions = np.stack(actions)
         print('computing k-means...')
         kmeans = KMeans(n_clusters=args.num_actions, verbose=1, random_state=0).fit(actions)
