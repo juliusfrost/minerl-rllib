@@ -1,6 +1,8 @@
 import copy
 import os
 
+import numpy as np
+from sklearn.neighbors import NearestNeighbors
 import gym
 import gym.wrappers
 import minerl
@@ -28,6 +30,26 @@ class MineRLActionWrapper(gym.ActionWrapper):
         return action['vector']
 
 
+class MineRLDiscreteActionWrapper(gym.ActionWrapper):
+    def __init__(self, env, num_actions=32, kmeans_file=None):
+        super().__init__(env)
+        self.num_actions = num_actions
+        if kmeans_file is None:
+            data_path = os.environ.get('MINERL_DATA_ROOT', 'data')
+            kmeans_file = os.path.join(data_path, f'{num_actions}-means', f'{env.env_spec.name}.npy')
+        self.kmeans = np.load(kmeans_file)
+        self.action_space = gym.spaces.Discrete(num_actions)
+        self.nearest_neighbors = NearestNeighbors(n_neighbors=1).fit(self.kmeans)
+
+    def action(self, action: int):
+        return self.kmeans[action]
+
+    def reverse_action(self, action: np.ndarray):
+        action = np.reshape(action, (1, 64))
+        distances, indices = self.nearest_neighbors.kneighbors(action)
+        return int(indices[0].item())
+
+
 class MineRLRewardPenaltyWrapper(gym.wrappers.TransformReward):
     def __init__(self, env, reward_penalty=0.001):
         super().__init__(env, lambda r: r - reward_penalty)
@@ -38,10 +60,12 @@ class MineRLTimeLimitWrapper(gym.wrappers.TimeLimit):
         super().__init__(env, env.env_spec.max_episode_steps)
 
 
-def wrap(env):
+def wrap(env: minerl.env.MineRLEnv, discrete=False, num_actions=32):
     env = MineRLTimeLimitWrapper(env)
     env = MineRLObservationWrapper(env)
     env = MineRLActionWrapper(env)
+    if discrete:
+        env = MineRLDiscreteActionWrapper(env, num_actions)
     return env
 
 
