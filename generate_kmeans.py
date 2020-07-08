@@ -6,8 +6,6 @@ import numpy as np
 from sklearn.cluster import KMeans
 from tqdm import tqdm
 
-os.environ['MINERL_DATA_ROOT'] = 'C:\\Users\\Julius\\Datasets\\minerl'
-
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--env', default=None)
