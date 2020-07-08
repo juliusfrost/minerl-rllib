@@ -161,44 +161,43 @@ def run(args, parser):
     if args.config_file:
         with open(args.config_file) as f:
             config_experiments = yaml.safe_load(f)
-
-    if args.algo and not args.config_file:
-        config_file = os.path.join('config', f'{args.algo}.yaml')
-        with open(config_file) as f:
-            implemented_experiments = yaml.safe_load(f)
-    else:
-        implemented_experiments = {}
-
-    if len(implemented_experiments) == 1:
-        experiment_name = list(implemented_experiments.keys())[0]
-    else:
-        experiment_name = args.experiment_name
-
-    # Note: keep this in sync with tune/config_parser.py
-    args_experiments = {
-        experiment_name: {  # i.e. log to ~/ray_results/default
-            "run": args.run,
-            "checkpoint_freq": args.checkpoint_freq,
-            "checkpoint_at_end": args.checkpoint_at_end,
-            "keep_checkpoints_num": args.keep_checkpoints_num,
-            "checkpoint_score_attr": args.checkpoint_score_attr,
-            "local_dir": args.local_dir,
-            "resources_per_trial": (
-                    args.resources_per_trial and
-                    resources_to_json(args.resources_per_trial)),
-            "stop": args.stop,
-            "config": dict(args.config, env=args.env),
-            "restore": args.restore,
-            "num_samples": args.num_samples,
-            "upload_dir": args.upload_dir,
-        }
-    }
-
-    # order of precedence: 1. config file or 2. implemented algorithms and 3. arguments
-    if not args.config_file:
-        experiments = deep_update(args_experiments, implemented_experiments)
-    else:
         experiments = config_experiments
+    else:
+        if args.algo:
+            config_file = os.path.join('config', f'{args.algo}.yaml')
+            with open(config_file) as f:
+                implemented_algo = yaml.safe_load(f)
+            experiment_name = list(implemented_algo.keys())[0]
+            args.run = implemented_algo[experiment_name]['run']
+        else:
+            implemented_algo = {}
+            experiment_name = args.experiment_name
+
+        config = dict(args.config, env=args.env)
+        if experiment_name in implemented_algo:
+            if 'config' in implemented_algo[experiment_name]:
+                config.update(implemented_algo[experiment_name]['config'])
+
+        # Note: keep this in sync with tune/config_parser.py
+        args_experiments = {
+            experiment_name: {  # i.e. log to ~/ray_results/default
+                "run": args.run,
+                "checkpoint_freq": args.checkpoint_freq,
+                "checkpoint_at_end": args.checkpoint_at_end,
+                "keep_checkpoints_num": args.keep_checkpoints_num,
+                "checkpoint_score_attr": args.checkpoint_score_attr,
+                "local_dir": args.local_dir,
+                "resources_per_trial": (
+                        args.resources_per_trial and
+                        resources_to_json(args.resources_per_trial)),
+                "stop": args.stop,
+                "config": config,
+                "restore": args.restore,
+                "num_samples": args.num_samples,
+                "upload_dir": args.upload_dir,
+            }
+        }
+        experiments = args_experiments
 
     register(discrete=args.discrete, num_actions=args.num_actions, data_dir=args.data_dir)
 
