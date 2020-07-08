@@ -9,7 +9,7 @@ from tqdm import tqdm
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--env', default=None)
-parser.add_argument('--num-actions', default=32)
+parser.add_argument('--num-actions', type=int, default=32)
 parser.add_argument('--data-dir', default=os.getenv('MINERL_DATA_ROOT', 'data'))
 
 
