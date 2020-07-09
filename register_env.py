@@ -7,6 +7,7 @@ import gym
 import gym.wrappers
 import minerl
 from ray.tune.registry import register_env
+from ray.tune.utils.util import merge_dicts
 
 
 class MineRLObservationWrapper(gym.ObservationWrapper):
@@ -31,12 +32,12 @@ class MineRLActionWrapper(gym.ActionWrapper):
 
 
 class MineRLDiscreteActionWrapper(gym.ActionWrapper):
-    def __init__(self, env, num_actions=32, kmeans_file=None):
+    def __init__(self, env, num_actions=32, data_dir=None):
         super().__init__(env)
         self.num_actions = num_actions
-        if kmeans_file is None:
-            data_path = os.environ.get('MINERL_DATA_ROOT', 'data')
-            kmeans_file = os.path.join(data_path, f'{num_actions}-means', f'{env.env_spec.name}.npy')
+        if data_dir is None:
+            data_dir = os.environ.get('MINERL_DATA_ROOT', 'data')
+        kmeans_file = os.path.join(data_dir, f'{num_actions}-means', f'{env.env_spec.name}.npy')
         self.kmeans = np.load(kmeans_file)
         self.action_space = gym.spaces.Discrete(num_actions)
         self.nearest_neighbors = NearestNeighbors(n_neighbors=1).fit(self.kmeans)
@@ -60,23 +61,30 @@ class MineRLTimeLimitWrapper(gym.wrappers.TimeLimit):
         super().__init__(env, env.env_spec.max_episode_steps)
 
 
-def wrap(env: minerl.env.MineRLEnv, discrete=False, num_actions=32):
+def wrap(env: minerl.env.MineRLEnv, discrete=False, num_actions=32, data_dir=None):
     env = MineRLTimeLimitWrapper(env)
     env = MineRLObservationWrapper(env)
     env = MineRLActionWrapper(env)
     if discrete:
-        env = MineRLDiscreteActionWrapper(env, num_actions)
+        env = MineRLDiscreteActionWrapper(env, num_actions, data_dir=data_dir)
     return env
 
 
-for env_spec in minerl.herobraine.envs.obfuscated_envs:
-    kwargs = dict(
-        observation_space=env_spec.observation_space,
-        action_space=env_spec.action_space,
-        docstr=env_spec.get_docstring(),
-        xml=os.path.join(minerl.herobraine.env_spec.MISSIONS_DIR, env_spec.xml),
-        env_spec=env_spec,
-    )
-    env_kwargs = copy.deepcopy(kwargs)
+def register(discrete=False, num_actions=32, data_dir=None, **kwargs):
+    """
+    Must be called to register the MineRL environments for RLlib
+    """
+    for env_spec in minerl.herobraine.envs.obfuscated_envs:
+        env_kwargs = copy.deepcopy(dict(
+            observation_space=env_spec.observation_space,
+            action_space=env_spec.action_space,
+            docstr=env_spec.get_docstring(),
+            xml=os.path.join(minerl.herobraine.env_spec.MISSIONS_DIR, env_spec.xml),
+            env_spec=env_spec,
+        ))
+        wrap_kwargs = dict(discrete=discrete, num_actions=num_actions, data_dir=data_dir)
 
-    register_env(env_spec.name, lambda env_config: wrap(minerl.env.MineRLEnv(**env_kwargs)))
+        def env_creator(env_config):
+            return wrap(minerl.env.MineRLEnv(**env_kwargs), **merge_dicts(wrap_kwargs, env_config))
+
+        register_env(env_spec.name, env_creator)
