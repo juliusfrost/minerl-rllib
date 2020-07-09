@@ -8,23 +8,19 @@ from ray.rllib.evaluation.sample_batch_builder import SampleBatchBuilder
 from ray.rllib.models.preprocessors import get_preprocessor
 from ray.rllib.offline.json_writer import JsonWriter
 
-import register_env
+from env import register
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--minerl-path', default=None)
+parser.add_argument('--data-path', default=os.getenv('MINERL_DATA_ROOT', 'data'))
 parser.add_argument('--save-path', default=None)
 parser.add_argument('--env', default=None)
 
 
 def main():
     args = parser.parse_args()
-    if args.minerl_path is None:
-        data_path = os.environ.get('MINERL_DATA_ROOT')
-    else:
-        data_path = args.minerl_path
 
     if args.save_path is None:
-        save_path = os.path.join(data_path, 'rllib')
+        save_path = os.path.join(args.data_path, 'rllib')
     else:
         save_path = args.save_path
 
@@ -35,9 +31,11 @@ def main():
     else:
         env_list = [args.env]
 
+    register()
+
     for env_name in env_list:
         env = gym.make(env_name)
-        env = register_env.MineRLObservationWrapper(register_env.MineRLActionWrapper(env))
+        env = env.MineRLObservationWrapper(env.MineRLActionWrapper(env))
 
         batch_builder = SampleBatchBuilder()
         writer = JsonWriter(os.path.join(save_path, env_name))
@@ -45,7 +43,7 @@ def main():
 
         env.close()
 
-        data = minerl.data.make(env_name, data_dir=data_path)
+        data = minerl.data.make(env_name, data_dir=args.data_path)
 
         for trajectory_name in data.get_trajectory_names():
             t = 0
