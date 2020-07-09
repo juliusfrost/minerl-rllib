@@ -3,16 +3,16 @@ Modified from https://github.com/ray-project/ray/blob/master/rllib/train.py
 """
 import argparse
 import os
+import pprint
 from pathlib import Path
-import yaml
 
 import ray
+import yaml
 from ray.cluster_utils import Cluster
+from ray.rllib.utils.framework import try_import_tf, try_import_torch
 from ray.tune.config_parser import make_parser
 from ray.tune.resources import resources_to_json
 from ray.tune.tune import _make_scheduler, run_experiments
-from ray.rllib.utils.framework import try_import_tf, try_import_torch
-from ray.tune.utils.util import deep_update
 
 from register_env import register
 
@@ -154,6 +154,9 @@ def create_parser(parser_creator=None):
         "--env", default='MineRLNavigateDenseVectorObf-v0', type=str, help="The gym environment to use.")
     parser.add_argument('--data-dir', type=Path, default=os.getenv('MINERL_DATA_ROOT', 'data'),
                         help='Path to MineRL data directory')
+    parser.add_argument('--mode', choices=['online', 'offline', 'mixed'], default='online')
+    parser.add_argument('--mixing-ratio', default=0.5,
+                        help='How much to sample from data over the environment')
     return parser
 
 
@@ -178,6 +181,18 @@ def run(args, parser):
             if 'config' in implemented_algo[experiment_name]:
                 config.update(implemented_algo[experiment_name]['config'])
 
+        if args.mode == 'offline':
+            config.update(dict(
+                explore=False,
+                input=args.data_path,
+                input_evaluation=['simulation'],
+            ))
+        elif args.mode == 'mixed':
+            config.update(dict(
+                input={args.data_path: args.mixing_ratio, 'sample': (1 - args.mixing_ratio)},
+                input_evaluation=['simulation'],
+            ))
+
         # Note: keep this in sync with tune/config_parser.py
         args_experiments = {
             experiment_name: {  # i.e. log to ~/ray_results/default
@@ -200,6 +215,12 @@ def run(args, parser):
         experiments = args_experiments
 
     register(discrete=args.discrete, num_actions=args.num_actions, data_dir=args.data_dir)
+
+    print('\nArguments:')
+    pprint.pprint(args)
+    print('\nExperiment config:')
+    pprint.pprint(experiments)
+    print()
 
     verbose = 1
     for exp in experiments.values():
