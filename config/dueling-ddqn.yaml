@@ -25,3 +25,5 @@ minerl-dueling-ddqn:
         prioritized_replay_beta_annealing_timesteps: 2000000
         num_gpus: 0.2
         timesteps_per_iteration: 10000
+        env_config:
+            discrete: true
