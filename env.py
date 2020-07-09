@@ -1,13 +1,13 @@
 import copy
 import os
 
-import numpy as np
-from sklearn.neighbors import NearestNeighbors
 import gym
 import gym.wrappers
 import minerl
+import numpy as np
 from ray.tune.registry import register_env
 from ray.tune.utils.util import merge_dicts
+from sklearn.neighbors import NearestNeighbors
 
 
 class MineRLObservationWrapper(gym.ObservationWrapper):

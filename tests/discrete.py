@@ -3,7 +3,7 @@ import numpy as np
 import gym
 from tqdm import tqdm
 import minerl
-from register_env import wrap
+from env import wrap
 
 
 def test_discrete():
