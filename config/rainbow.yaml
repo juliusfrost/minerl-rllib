@@ -1,0 +1,45 @@
+# base hyperparameters used from sample efficient rainbow: https://arxiv.org/abs/1906.05243
+minerl-rainbow:
+    run: DQN
+    config:
+        double_q: true
+        dueling: true
+        num_atoms: 51
+        noisy: True
+        sigma0: 0.1 # noisy nets parameter
+        gamma: 0.99
+        lr: .0001
+        adam_epsilon: .00015
+        grad_clip: 10
+        hiddens: [512]
+        learning_starts: 1600  # 20000 -> 1600
+        buffer_size: 8000000 # single replay buffer of maximum time steps
+        rollout_fragment_length: 1  # 4 -> 1
+        train_batch_size: 32
+        exploration_config:
+            epsilon_timesteps: 2
+            final_epsilon: 0.0
+        target_network_update_freq: 500
+        prioritized_replay: True
+        prioritized_replay_alpha: 0.5
+        prioritized_replay_beta: 0.4
+        final_prioritized_replay_beta: 1.0
+        prioritized_replay_beta_annealing_timesteps: 8000000 # set to the expected maximum number of time steps
+        n_step: 20  # 3 -> 20
+        num_gpus: 1
+        model:
+            # Filter config. List of [out_channels, kernel, stride] for each filter
+            conv_filters: [
+                [32, [5, 5], 5],
+                [64, [5, 5], 5],
+            ]
+            fcnet_hiddens: [256]
+            framestack: false
+            dim: 64  # this shouldn't do anything in the preprocessor but MineRL pov observations are 64x64
+#            use_lstm: true
+#            max_seq_len: 32
+#            lstm_use_prev_action_reward: true
+        env_config:
+            discrete: true
+            action_repeat: 4
+            num_stack: 4
