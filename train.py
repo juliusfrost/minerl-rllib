@@ -196,9 +196,9 @@ def run(args, parser):
         if 'time_total_s' not in args.stop:
             # The MineRL competition training time limit is 4 days. Subtract an hour for evaluation.
             args.stop['time_total_s'] = int(4 * 24 * 60 * 60 - 3600)
-        if 'num_steps_sampled' not in args.stop:
+        if 'info/num_steps_sampled' not in args.stop:
             # The MineRL competition environment sample limit is 8 million steps.
-            args.stop['num_steps_sampled'] = 8000000
+            args.stop['info/num_steps_sampled'] = 8000000
 
         # Note: keep this in sync with tune/config_parser.py
         args_experiments = {
