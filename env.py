@@ -92,7 +92,7 @@ class MineRLObservationStack(gym.Wrapper):
                 if isinstance(space, gym.spaces.Box):
                     low = np.repeat(space.low[np.newaxis, ...], num_stack, axis=0)
                     high = np.repeat(space.high[np.newaxis, ...], num_stack, axis=0)
-                    new_space = gym.spaces.Box(low=low, high=high, dtype=self.observation_space.dtype)
+                    new_space = gym.spaces.Box(low=low, high=high, dtype=space.dtype)
                     new_spaces.append(new_space)
                 else:
                     raise NotImplementedError
