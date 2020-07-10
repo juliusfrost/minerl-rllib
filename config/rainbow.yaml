@@ -19,7 +19,7 @@ minerl-rainbow:
         exploration_config:
             epsilon_timesteps: 2
             final_epsilon: 0.0
-        target_network_update_freq: 500
+        target_network_update_freq: 2000
         prioritized_replay: True
         prioritized_replay_alpha: 0.5
         prioritized_replay_beta: 0.4
