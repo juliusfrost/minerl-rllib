@@ -133,7 +133,7 @@ def wrap(env: minerl.env.MineRLEnv, discrete=False, num_actions=32, data_dir=Non
     if discrete:
         env = MineRLDiscreteActionWrapper(env, num_actions, data_dir=data_dir)
     if num_stack > 1:
-        env = MineRLStackObservation(env, num_stack)
+        env = MineRLObservationStack(env, num_stack)
     if action_repeat > 1:
         env = MineRLActionRepeat(env, action_repeat)
     return env
