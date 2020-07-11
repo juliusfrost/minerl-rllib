@@ -133,8 +133,18 @@ class MineRLGrayScale(gym.ObservationWrapper):
         return gray_scaled_pov, vector
 
 
+class MineRLDeterministic(gym.Wrapper):
+    def __init__(self, env, seed: int):
+        super().__init__(env)
+        self._set_seed = seed
+
+    def reset(self, **kwargs):
+        self.seed(self._set_seed)
+        return self.env.reset()
+
+
 def wrap(env: minerl.env.MineRLEnv, discrete=False, num_actions=32, data_dir=None, num_stack=1, action_repeat=1,
-         gray_scale=False):
+         gray_scale=False, seed=None):
     env = MineRLTimeLimitWrapper(env)
     env = MineRLObservationWrapper(env)
     env = MineRLActionWrapper(env)
@@ -146,6 +156,8 @@ def wrap(env: minerl.env.MineRLEnv, discrete=False, num_actions=32, data_dir=Non
         env = MineRLObservationStack(env, num_stack)
     if action_repeat > 1:
         env = MineRLActionRepeat(env, action_repeat)
+    if seed is not None:
+        env = MineRLDeterministic(env, seed)
     return env
 
 
