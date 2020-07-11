@@ -44,4 +44,3 @@ minerl-rainbow:
             action_repeat: 4
             num_stack: 4
             gray_scale: true
-            seed: 0
