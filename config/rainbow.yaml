@@ -43,3 +43,4 @@ minerl-rainbow:
             discrete: true
             action_repeat: 4
             num_stack: 4
+            gray_scale: true

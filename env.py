@@ -126,12 +126,22 @@ class MineRLObservationStack(gym.Wrapper):
         return self._get_observation()
 
 
-def wrap(env: minerl.env.MineRLEnv, discrete=False, num_actions=32, data_dir=None, num_stack=1, action_repeat=1):
+class MineRLGrayScale(gym.ObservationWrapper):
+    def observation(self, observation):
+        pov, vector = observation
+        gray_scaled_pov = np.mean(pov, axis=2, keepdims=True)
+        return gray_scaled_pov, vector
+
+
+def wrap(env: minerl.env.MineRLEnv, discrete=False, num_actions=32, data_dir=None, num_stack=1, action_repeat=1,
+         gray_scale=False):
     env = MineRLTimeLimitWrapper(env)
     env = MineRLObservationWrapper(env)
     env = MineRLActionWrapper(env)
     if discrete:
         env = MineRLDiscreteActionWrapper(env, num_actions, data_dir=data_dir)
+    if gray_scale:
+        env = MineRLGrayScale(env)
     if num_stack > 1:
         env = MineRLObservationStack(env, num_stack)
     if action_repeat > 1:
