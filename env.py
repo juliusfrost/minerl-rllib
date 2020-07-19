@@ -69,11 +69,13 @@ class MineRLActionRepeat(gym.Wrapper):
 
     def step(self, action):
         obs, reward, done, info = None, None, None, None
+        total_reward = 0
         for _ in range(self.action_repeat):
             obs, reward, done, info = self.env.step(action)
+            total_reward += reward
             if done:
                 break
-        return obs, reward, done, info
+        return obs, total_reward, done, info
 
 
 class MineRLObservationStack(gym.Wrapper):
@@ -126,16 +128,47 @@ class MineRLObservationStack(gym.Wrapper):
         return self._get_observation()
 
 
-def wrap(env: minerl.env.MineRLEnv, discrete=False, num_actions=32, data_dir=None, num_stack=1, action_repeat=1):
+class MineRLGrayScale(gym.ObservationWrapper):
+    def __init__(self, env):
+        super().__init__(env)
+        pov_space, vector_space = self.observation_space
+        assert isinstance(pov_space, gym.spaces.Box)
+        low = np.min(pov_space.low, axis=2, keepdims=True)
+        high = np.max(pov_space.high, axis=2, keepdims=True)
+        pov_space = gym.spaces.Box(low, high, dtype=pov_space.dtype)
+        self.observation_space = gym.spaces.Tuple((pov_space, vector_space))
+
+    def observation(self, observation):
+        pov, vector = observation
+        gray_scaled_pov = np.mean(pov, axis=2, keepdims=True)
+        return gray_scaled_pov, vector
+
+
+class MineRLDeterministic(gym.Wrapper):
+    def __init__(self, env, seed: int):
+        super().__init__(env)
+        self._set_seed = seed
+
+    def reset(self, **kwargs):
+        self.seed(self._set_seed)
+        return self.env.reset()
+
+
+def wrap(env: minerl.env.MineRLEnv, discrete=False, num_actions=32, data_dir=None, num_stack=1, action_repeat=1,
+         gray_scale=False, seed=None):
     env = MineRLTimeLimitWrapper(env)
     env = MineRLObservationWrapper(env)
     env = MineRLActionWrapper(env)
     if discrete:
         env = MineRLDiscreteActionWrapper(env, num_actions, data_dir=data_dir)
+    if gray_scale:
+        env = MineRLGrayScale(env)
     if num_stack > 1:
         env = MineRLObservationStack(env, num_stack)
     if action_repeat > 1:
         env = MineRLActionRepeat(env, action_repeat)
+    if seed is not None:
+        env = MineRLDeterministic(env, seed)
     return env
 
 
