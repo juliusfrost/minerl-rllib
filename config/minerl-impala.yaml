@@ -1,0 +1,29 @@
+minerl-impala:
+    run: IMPALA
+    config:
+        rollout_fragment_length: 50
+        train_batch_size: 500
+        num_workers: 5
+        num_envs_per_worker: 1
+        clip_rewards: True
+        lr_schedule: [
+            [0, 0.0005],
+            [20000000, 0.000000000001],
+        ]
+        model:
+            # Filter config. List of [out_channels, kernel, stride] for each filter
+            conv_filters: [
+            [64, [4, 4], 4],
+            [128, [4, 4], 4],
+            [256, [4, 4], 4],
+            ]
+            conv_activation: relu
+            fcnet_activation: tanh
+            fcnet_hiddens: [256]
+            free_log_std: false
+            no_final_linear: false
+            vf_share_layers: true
+            use_lstm: true
+            max_seq_len: 20
+            lstm_cell_size: 256
+            lstm_use_prev_action_reward: true
