@@ -7,7 +7,6 @@ import gym.wrappers
 import minerl
 import numpy as np
 from ray.tune.registry import register_env
-from ray.tune.utils.util import merge_dicts
 from sklearn.neighbors import NearestNeighbors
 
 
@@ -185,8 +184,10 @@ def register(discrete=False, num_actions=32, data_dir=None, **kwargs):
             env_spec=env_spec,
         ))
         wrap_kwargs = dict(discrete=discrete, num_actions=num_actions, data_dir=data_dir)
+        wrap_kwargs.update(kwargs)
 
         def env_creator(env_config):
-            return wrap(minerl.env.MineRLEnv(**env_kwargs), **merge_dicts(wrap_kwargs, env_config))
+            wrap_kwargs.update(env_config)
+            return wrap(minerl.env.MineRLEnv(**env_kwargs), **wrap_kwargs)
 
         register_env(env_spec.name, env_creator)
