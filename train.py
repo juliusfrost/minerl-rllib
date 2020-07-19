@@ -13,6 +13,7 @@ from ray.rllib.utils.framework import try_import_tf, try_import_torch
 from ray.tune.config_parser import make_parser
 from ray.tune.resources import resources_to_json
 from ray.tune.tune import _make_scheduler, run_experiments
+from ray.tune.utils import merge_dicts
 
 # Try to import both backends for flag checking/warnings.
 tf1, tf, tfv = try_import_tf()
@@ -222,8 +223,8 @@ def run(args, parser):
                 "upload_dir": args.upload_dir,
             }
             # overwrite the settings from arguments with those in the experiment config file
-            settings_from_args.update(experiment_settings)
-            experiments.update({experiment_name: settings_from_args})
+            settings = merge_dicts(settings_from_args, experiment_settings)
+            experiments.update({experiment_name: settings})
 
         if any('MineRL' in setting['config']['env'] for setting in experiments.values()):
             from env import register
