@@ -60,6 +60,10 @@ BASELINE_CONFIG = {
 
 
 class MineRLTorchModel(TorchModelV2, nn.Module):
+    """
+    Baseline MineRL PyTorch Model
+    See rllib documentation on custom models: https://docs.ray.io/en/master/rllib-models.html#pytorch-models
+    """
     def __init__(self, obs_space, action_space, num_outputs, model_config, name):
         TorchModelV2.__init__(self, obs_space, action_space, num_outputs, model_config, name)
         nn.Module.__init__(self)
