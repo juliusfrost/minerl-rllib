@@ -20,6 +20,8 @@ BASELINE_CONFIG = {
     'rnn_type': 'gru',
     # specifies the number of rnn layers
     'rnn_layers': 1,
+    # specifies whether to include the previous action and reward as part of the observation
+    'use_prev_action_reward': True,
 
     # specifies the network architecture for pov image observations
     # gets the pov network factory method from pov.py
@@ -61,12 +63,13 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
     def __init__(self, obs_space, action_space, num_outputs, model_config, name):
         TorchModelV2.__init__(self, obs_space, action_space, num_outputs, model_config, name)
         nn.Module.__init__(self)
-        model_config = merge_dicts(BASELINE_CONFIG, model_config)
+        model_config = merge_dicts(BASELINE_CONFIG, model_config['custom_model_config'])
 
         state_embed_size = model_config['state_embed_size']
         self.use_rnn = model_config['use_rnn']
         rnn_type = model_config['rnn_type']
         rnn_layers = model_config['rnn_layers']
+        self.use_prev_action_reward = model_config['use_prev_action_reward']
 
         action_net_kwargs = model_config['action_net_kwargs']
         if isinstance(action_space, gym.spaces.Discrete):
@@ -78,11 +81,14 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
         def get_factory(network_name):
             return getattr(getattr(models.torch, network_name), model_config[f'{network_name}_net'])
 
-        self._action_network, action_embed_size = get_factory('action')(**action_net_kwargs)
-        self._reward_network, reward_embed_size = get_factory('reward')(**model_config['reward_net_kwargs'])
         self._pov_network, pov_embed_size = get_factory('pov')(**model_config['pov_net_kwargs'])
         self._vector_network, vector_embed_size = get_factory('vector')(**model_config['vector_net_kwargs'])
-        state_input_size = pov_embed_size + vector_embed_size + action_embed_size + reward_embed_size
+        state_input_size = pov_embed_size + vector_embed_size
+        if self.use_prev_action_reward:
+            self._action_network, action_embed_size = get_factory('action')(**action_net_kwargs)
+            self._reward_network, reward_embed_size = get_factory('reward')(**model_config['reward_net_kwargs'])
+            state_input_size += action_embed_size + reward_embed_size
+
         if self.use_rnn:
             if rnn_type == 'gru':
                 self._rnn = nn.GRU(state_input_size, state_embed_size, rnn_layers)
@@ -103,24 +109,30 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
     def get_initial_state(self):
         if self.use_rnn:
             return [torch.zeros(self._rnn.num_layers, self._rnn.hidden_size)]
+        return []
 
     def forward(self, input_dict, state, seq_lens):
         device = next(self.parameters()).device
         pov = input_dict['obs'][0].permute(0, 3, 1, 2)  # n,c,h,w
         vector = input_dict['obs'][1]
-        prev_actions = input_dict['prev_actions']
-        if self.discrete:
-            prev_actions = prev_actions.long()
-        prev_rewards = input_dict['prev_rewards']
-        prev_rewards = torch.reshape(prev_rewards, (-1, 1))
-
         pov_embed = self._pov_network(pov.to(device))
         pov_embed = torch.reshape(pov_embed, pov_embed.shape[:2])
         vector_embed = self._vector_network(vector.to(device))
-        action_embed = self._action_network(prev_actions.to(device))
-        reward_embed = self._reward_network(prev_rewards.to(device))
 
-        state_inputs = torch.cat((pov_embed, vector_embed, action_embed, reward_embed), dim=-1)
+        if self.use_prev_action_reward:
+            prev_actions = input_dict['prev_actions']
+            if self.discrete:
+                prev_actions = prev_actions.long()
+            prev_rewards = input_dict['prev_rewards']
+            prev_rewards = torch.reshape(prev_rewards, (-1, 1))
+
+            action_embed = self._action_network(prev_actions.to(device))
+            reward_embed = self._reward_network(prev_rewards.to(device))
+
+            state_inputs = torch.cat((pov_embed, vector_embed, action_embed, reward_embed), dim=-1)
+        else:
+            state_inputs = torch.cat((pov_embed, vector_embed), dim=-1)
+
         if self.use_rnn:
             prev_state = state[-1].permute(1, 0, 2).to(device)
             batch_t, batch_n, state_size = 1, 1, state_inputs.size(1)
@@ -140,7 +152,7 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
                 raise NotImplementedError
         else:
             self._logits = self._state_network(state_inputs)
-            rnn_state = None
+            rnn_state = []
 
         outputs = self._policy_head(self._logits)
         return outputs, rnn_state
