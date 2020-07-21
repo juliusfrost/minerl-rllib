@@ -23,6 +23,7 @@ Currently experiments do not support headless mode.
 Multiprocessing is available but not merged into minerl ([see this pull](https://github.com/minerllabs/minerl/pull/352)). For now, do
 ```
 git clone https://github.com/minerllabs/minerl.git
+cd minerl
 git fetch origin pull/352/head:process-safe
 git checkout process-safe
 pip install -e .
