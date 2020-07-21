@@ -25,6 +25,7 @@ Multiprocessing is available but not merged into minerl ([see this pull](https:/
 git clone https://github.com/minerllabs/minerl.git
 git fetch origin pull/352/head:process-safe
 git checkout process-safe
+pip install -e .
 ```
 
 For discrete action spaces, make sure you have the environment variable `MINERL_DATA_ROOT` set, otherwise it defaults to `data`. Then, run `python generate_kmeans.py`
