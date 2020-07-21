@@ -7,7 +7,8 @@ RLlib natively supports TensorFlow, TensorFlow Eager, and PyTorch, but most of i
 
 ## Installation
 
-OS: Linux (waiting on ray Windows support)
+OS: Linux  
+If you want to run on Windows, you can install the ray nightly version, but some RL algorithms may break.
 
 Make sure you have JDK 1.8 on your system for MineRL.
 
