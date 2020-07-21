@@ -20,6 +20,8 @@ See [Planned Implementation Details](Implementation.md)
 
 Currently experiments do not support headless mode.
 
+For discrete action spaces, make sure you have the environment variable `MINERL_DATA_ROOT` set, otherwise it defaults to `data`. Then, run `python generate_kmeans.py`
+
 ### Online Reinforcement Learning [WIP]
 This is the standard reinforcement learning agent-environment loop.
 
