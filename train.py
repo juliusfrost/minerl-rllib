@@ -15,6 +15,10 @@ from ray.tune.resources import resources_to_json
 from ray.tune.tune import _make_scheduler, run_experiments
 from ray.tune.utils import merge_dicts
 
+import models
+
+models.register()
+
 # Try to import both backends for flag checking/warnings.
 tf1, tf, tfv = try_import_tf()
 torch, _ = try_import_torch()

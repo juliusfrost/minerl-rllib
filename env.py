@@ -20,7 +20,6 @@ class MineRLRandomDebugEnv(gym.Env):
         self.action_space = gym.spaces.Dict(dict(vector=action_space))
         self.done = False
         self.t = 0
-        self.name = 'MineRLDebug-v0'
 
     def _obs(self):
         return self.observation_space.sample()
