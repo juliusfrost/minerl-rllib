@@ -1,5 +1,5 @@
 # base hyperparameters used from sample efficient rainbow: https://arxiv.org/abs/1906.05243
-minerl-rainbow:
+atari-rainbow:
     run: DQN
     config:
         double_q: true
@@ -27,6 +27,7 @@ minerl-rainbow:
         prioritized_replay_beta_annealing_timesteps: 8000000 # set to the expected maximum number of time steps
         n_step: 20  # 3 -> 20
         num_gpus: 1
+
         model:
             # Filter config. List of [out_channels, kernel, stride] for each filter
             conv_filters: [
@@ -36,9 +37,8 @@ minerl-rainbow:
             fcnet_hiddens: [256]
             framestack: false
             dim: 64  # this shouldn't do anything in the preprocessor but MineRL pov observations are 64x64
-#            use_lstm: true
-#            max_seq_len: 32
-#            lstm_use_prev_action_reward: true
+
+        # MineRL
         env_config:
             discrete: true
             action_repeat: 4

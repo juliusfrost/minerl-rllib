@@ -3,10 +3,14 @@ minerl-impala:
     config:
         rollout_fragment_length: 50
         train_batch_size: 500
-        num_workers: 32
-        num_envs_per_worker: 5
+        num_workers: 2
+        num_envs_per_worker: 1
         clip_rewards: True
         lr_schedule: [
-            [0, 0.0005],
+            [0, 0.0001],
             [20000000, 0.000000000001],
         ]
+
+        framework: torch
+        model:
+            custom_model: minerl_torch_model

@@ -1,4 +1,4 @@
-minerl-sac:
+atari-sac:
     run: SAC
     config:
         gamma: 0.99

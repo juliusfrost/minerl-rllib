@@ -1,9 +1,9 @@
-minerl-dist-dqn:
+atari-basic-dqn:
     run: DQN
     config:
         double_q: false
         dueling: false
-        num_atoms: 51
+        num_atoms: 1
         noisy: false
         prioritized_replay: false
         n_step: 1
@@ -23,5 +23,7 @@ minerl-dist-dqn:
         prioritized_replay_beta_annealing_timesteps: 2000000
         num_gpus: 0.2
         timesteps_per_iteration: 10000
+
+        # MineRL
         env_config:
             discrete: true
