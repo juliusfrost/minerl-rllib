@@ -23,7 +23,8 @@ Currently experiments do not support headless mode.
 ### Online Reinforcement Learning [WIP]
 This is the standard reinforcement learning agent-environment loop.
 
-`python train.py --mode=online`
+Example:
+`python train.py --experiment custom_model/impala`
 
 ### Offline Reinforcement Learning [TODO]
 As human demonstrations available in MineRL, it is possible to increase sample efficiency by using them to learn a better policy. 
