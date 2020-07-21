@@ -8,7 +8,7 @@ from ray.rllib.evaluation.sample_batch_builder import SampleBatchBuilder
 from ray.rllib.models.preprocessors import get_preprocessor
 from ray.rllib.offline.json_writer import JsonWriter
 
-from env import register
+from envs import register
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data-path', default=os.getenv('MINERL_DATA_ROOT', 'data'))

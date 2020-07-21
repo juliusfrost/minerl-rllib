@@ -235,8 +235,8 @@ def run(args, parser):
             experiments.update({experiment_name: settings})
 
         if any('MineRL' in setting['config']['env'] for setting in experiments.values()):
-            from env import register
-            register(discrete=args.discrete, num_actions=args.num_actions, data_dir=args.data_dir)
+            import envs
+            envs.register(discrete=args.discrete, num_actions=args.num_actions, data_dir=args.data_dir)
 
     print('\nArguments:')
     pprint.pprint(args)

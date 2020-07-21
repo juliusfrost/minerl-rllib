@@ -2,8 +2,7 @@ import os
 import numpy as np
 import gym
 from tqdm import tqdm
-import minerl
-from env import wrap
+from envs import wrap
 
 
 def test_discrete():
