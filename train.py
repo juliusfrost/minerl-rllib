@@ -161,6 +161,7 @@ def create_parser(parser_creator=None):
     parser.add_argument('--mode', choices=['online', 'offline', 'mixed'], default='online')
     parser.add_argument('--mixing-ratio', default=0.5,
                         help='How much to sample from data over the environment')
+    parser.add_argument('--debug', action='store_true')
     return parser
 
 
@@ -178,6 +179,9 @@ def run(args, parser):
                 config_dict = yaml.safe_load(f)
         else:
             config_dict = {args.name: {}}
+
+        if args.debug:
+            args.env = 'MineRLRandomDebug-v0'
 
         experiments = {}
         for experiment_name, experiment_settings in config_dict.items():

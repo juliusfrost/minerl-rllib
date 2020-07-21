@@ -20,6 +20,7 @@ class MineRLRandomDebugEnv(gym.Env):
         self.action_space = gym.spaces.Dict(dict(vector=action_space))
         self.done = False
         self.t = 0
+        self.env_spec = minerl.herobraine.envs.MINERL_OBTAIN_DIAMOND_OBF_V0
 
     def _obs(self):
         return self.observation_space.sample()
@@ -189,8 +190,7 @@ class MineRLDeterministic(gym.Wrapper):
 
 def wrap(env, discrete=False, num_actions=32, data_dir=None, num_stack=1, action_repeat=1,
          gray_scale=False, seed=None):
-    if isinstance(env, minerl.env.MineRLEnv):
-        env = MineRLTimeLimitWrapper(env)
+    env = MineRLTimeLimitWrapper(env)
     env = MineRLObservationWrapper(env)
     env = MineRLActionWrapper(env)
     if discrete:
