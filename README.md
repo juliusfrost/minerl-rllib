@@ -18,7 +18,13 @@ Install [PyTorch](https://pytorch.org/get-started/locally/) and [TensorFlow](htt
 
 See [Planned Implementation Details](Implementation.md)
 
-Currently experiments do not support headless mode.
+Currently experiments do not support headless mode.  
+Multiprocessing is available but not merged into minerl ([see this pull](https://github.com/minerllabs/minerl/pull/352)). For now, do
+```
+git clone https://github.com/minerllabs/minerl.git
+git fetch origin pull/352/head:process-safe
+git checkout process-safe
+```
 
 For discrete action spaces, make sure you have the environment variable `MINERL_DATA_ROOT` set, otherwise it defaults to `data`. Then, run `python generate_kmeans.py`
 
