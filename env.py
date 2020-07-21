@@ -10,6 +10,41 @@ from ray.tune.registry import register_env
 from sklearn.neighbors import NearestNeighbors
 
 
+class MineRLRandomDebugEnv(gym.Env):
+    def __init__(self):
+        super(MineRLRandomDebugEnv, self).__init__()
+        pov_space = gym.spaces.Box(low=0, high=255, shape=(64, 64, 3))
+        vector_space = gym.spaces.Box(low=-1.2000000476837158, high=1.2000000476837158, shape=(64,))
+        self.observation_space = gym.spaces.Dict(dict(pov=pov_space, vector=vector_space))
+        action_space = gym.spaces.Box(low=-1.0499999523162842, high=1.0499999523162842, shape=(64,))
+        self.action_space = gym.spaces.Dict(dict(vector=action_space))
+        self.done = False
+        self.t = 0
+        self.name = 'MineRLDebug-v0'
+
+    def _obs(self):
+        return self.observation_space.sample()
+
+    def step(self, action):
+        obs = self._obs()
+        reward = 0
+        if self.t < 100:
+            self.done = False
+        else:
+            self.done = True
+        info = {}
+        self.t += 1
+        return obs, reward, self.done, info
+
+    def reset(self):
+        self.done = False
+        self.t = 0
+        return self._obs()
+
+    def render(self, mode='human'):
+        pass
+
+
 class MineRLObservationWrapper(gym.ObservationWrapper):
     def __init__(self, env):
         super().__init__(env)
@@ -153,9 +188,10 @@ class MineRLDeterministic(gym.Wrapper):
         return self.env.reset()
 
 
-def wrap(env: minerl.env.MineRLEnv, discrete=False, num_actions=32, data_dir=None, num_stack=1, action_repeat=1,
+def wrap(env, discrete=False, num_actions=32, data_dir=None, num_stack=1, action_repeat=1,
          gray_scale=False, seed=None):
-    env = MineRLTimeLimitWrapper(env)
+    if isinstance(env, minerl.env.MineRLEnv):
+        env = MineRLTimeLimitWrapper(env)
     env = MineRLObservationWrapper(env)
     env = MineRLActionWrapper(env)
     if discrete:
@@ -175,6 +211,9 @@ def register(discrete=False, num_actions=32, data_dir=None, **kwargs):
     """
     Must be called to register the MineRL environments for RLlib
     """
+    wrap_kwargs = dict(discrete=discrete, num_actions=num_actions, data_dir=data_dir)
+    wrap_kwargs.update(kwargs)
+
     for env_spec in minerl.herobraine.envs.obfuscated_envs:
         env_kwargs = copy.deepcopy(dict(
             observation_space=env_spec.observation_space,
@@ -183,11 +222,15 @@ def register(discrete=False, num_actions=32, data_dir=None, **kwargs):
             xml=os.path.join(minerl.herobraine.env_spec.MISSIONS_DIR, env_spec.xml),
             env_spec=env_spec,
         ))
-        wrap_kwargs = dict(discrete=discrete, num_actions=num_actions, data_dir=data_dir)
-        wrap_kwargs.update(kwargs)
 
         def env_creator(env_config):
             wrap_kwargs.update(env_config)
             return wrap(minerl.env.MineRLEnv(**env_kwargs), **wrap_kwargs)
 
         register_env(env_spec.name, env_creator)
+
+    def env_creator(env_config):
+        wrap_kwargs.update(env_config)
+        return wrap(MineRLRandomDebugEnv(), **wrap_kwargs)
+
+    register_env('MineRLRandomDebug-v0', env_creator)
