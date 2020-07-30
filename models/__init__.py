@@ -1,8 +1,4 @@
-import models.torch.action
-import models.torch.baseline
-import models.torch.pov
-import models.torch.reward
-import models.torch.vector
+import models.torch
 
 
 def register():
