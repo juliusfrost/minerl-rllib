@@ -16,7 +16,7 @@ BASELINE_CONFIG = {
     # specifies whether to use a recurrent neural network for the state embedding
     'use_rnn': True,
     # specifies the type of rnn layer
-    # implemented: [gru]
+    # implemented: [gru, lstm]
     'rnn_type': 'gru',
     # specifies the number of rnn layers
     'rnn_layers': 1,
@@ -94,8 +94,10 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
             state_input_size += action_embed_size + reward_embed_size
 
         if self.use_rnn:
-            if rnn_type == 'gru':
-                self._rnn = nn.GRU(state_input_size, state_embed_size, rnn_layers)
+            if rnn_type == 'lstm':
+                self._rnn = models.torch.rnn.LSTMBaseline(state_input_size, state_embed_size, rnn_layers)
+            elif rnn_type == 'gru':
+                self._rnn = models.torch.rnn.GRUBaseline(state_input_size, state_embed_size, rnn_layers)
             else:
                 raise NotImplementedError
         else:
@@ -112,7 +114,7 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
 
     def get_initial_state(self):
         if self.use_rnn:
-            return [torch.zeros(self._rnn.num_layers, self._rnn.hidden_size)]
+            return self._rnn.initial_state()
         return []
 
     def forward(self, input_dict, state, seq_lens):
@@ -138,7 +140,6 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
             state_inputs = torch.cat((pov_embed, vector_embed), dim=-1)
 
         if self.use_rnn:
-            prev_state = state[-1].permute(1, 0, 2).to(device)
             batch_t, batch_n, state_size = 1, 1, state_inputs.size(1)
             if isinstance(seq_lens, np.ndarray):
                 batch_t, batch_n = state_inputs.size(0) // len(seq_lens), len(seq_lens)
@@ -146,14 +147,10 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
                 state_inputs = torch.nn.utils.rnn.pack_padded_sequence(state_inputs, seq_lens, enforce_sorted=False)
             else:
                 state_inputs = torch.reshape(state_inputs, (batch_t, batch_n, state_size))
-            rnn_output, h_n = self._rnn(state_inputs, prev_state)
+            rnn_output, rnn_state = self._rnn(state_inputs, state)
             if isinstance(seq_lens, np.ndarray):
                 rnn_output, _ = torch.nn.utils.rnn.pad_packed_sequence(rnn_output)
             self._logits = torch.reshape(rnn_output, (batch_t * batch_n, self._rnn.hidden_size))
-            if isinstance(h_n, torch.Tensor):
-                rnn_state = [h_n.permute(1, 0, 2)]
-            else:
-                raise NotImplementedError
         else:
             self._logits = self._state_network(state_inputs)
             rnn_state = []
