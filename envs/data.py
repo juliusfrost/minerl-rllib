@@ -43,6 +43,10 @@ class MinerRLDataEnv(gym.Env):
         pass
 
 
+def get_env(env: MinerRLDataEnv, env_config):
+    return wrap(env, **env_config)
+
+
 class MineRLReader(InputReader):
     def __init__(self, env_config, environment, data_dir, num_workers, worker_batch_size=4, minimum_size_to_dequeue=32):
         super().__init__()
