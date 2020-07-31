@@ -20,11 +20,13 @@ parser.add_argument('--env-config', default='{}', type=json.loads,
                     help='specifies environment configuration options. overrides config file specifications')
 
 
-def get_save_path(data_dir, env_config):
+def get_save_path(data_dir, env_config, env_name=None):
     save_dir = 'env-config'
     for key, value in env_config.items():
         save_dir += f'--{key}-{value}'
     save_path = os.path.join(data_dir, 'rllib', save_dir)
+    if env_name is not None:
+        save_path = os.path.join(save_path, env_name)
     return save_path
 
 
