@@ -53,12 +53,11 @@ def wrap_env(env: MinerRLDataEnv, env_config):
     return wrap(env, **env_config)
 
 
-def write_jsons(environment, data_dir, env_config, preprocess=False, **kwargs):
+def write_jsons(environment, data_dir, env_config, save_path, preprocess=False, **kwargs):
     data_pipeline = minerl.data.make(environment, data_dir, **kwargs)
     env = MinerRLDataEnv(data_pipeline)
     env = wrap_env(env, env_config)
 
-    save_path = os.path.join(data_dir, 'rllib')
     batch_builder = SampleBatchBuilder()
     writer = JsonWriter(os.path.join(save_path, environment))
     prep = get_preprocessor(env.observation_space)(env.observation_space)
