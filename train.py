@@ -145,16 +145,6 @@ def create_parser(parser_creator=None):
     parser.add_argument('--experiment', default=None, type=str,
                         help='name of the experiment yaml file in the config folder')
     parser.add_argument(
-        '--discrete',
-        action='store_true',
-        help='Use discrete action space with kmeans'
-    )
-    parser.add_argument(
-        '--num-actions',
-        default=32,
-        help='Number of discrete actions used for kmeans'
-    )
-    parser.add_argument(
         "--env", default='MineRLNavigateDenseVectorObf-v0', type=str, help="The gym environment to use.")
     parser.add_argument('--data-dir', type=Path, default=os.getenv('MINERL_DATA_ROOT', 'data'),
                         help='Path to MineRL data directory')
@@ -236,7 +226,7 @@ def run(args, parser):
 
         if any('MineRL' in setting['config']['env'] for setting in experiments.values()):
             import envs
-            envs.register(discrete=args.discrete, num_actions=args.num_actions, data_dir=args.data_dir)
+            envs.register(data_dir=args.data_dir)
 
     print('\nArguments:')
     pprint.pprint(args)
