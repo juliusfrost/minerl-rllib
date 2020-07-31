@@ -11,7 +11,7 @@ from envs.data import write_jsons
 parser = argparse.ArgumentParser()
 parser.add_argument('--data-dir', type=str, default=os.getenv('MINERL_DATA_ROOT', 'data'),
                     help='path to the data directory of the MineRL data')
-parser.add_argument('--save-dir', default=None, type=str,
+parser.add_argument('--save-path', default=None, type=str,
                     help='directory to write jsons. defaults to the rllib subdirectory of the MineRL data path')
 parser.add_argument('--env', type=str, default=None, help='Environment name to write jsons')
 parser.add_argument('--preprocess', action='store_true', help='whether to preprocess observations')
