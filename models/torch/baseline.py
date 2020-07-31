@@ -107,8 +107,6 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
                 self._rnn = models.torch.rnn.LSTMBaseline(state_input_size, **rnn_config)
             elif rnn_type == 'gru':
                 self._rnn = models.torch.rnn.GRUBaseline(state_input_size, **rnn_config)
-            elif rnn_type == 'hrvae':
-                self._rnn = models.torch.hierarchical_recurrent_vae.HRVAE(state_input_size, **rnn_config)
             else:
                 raise NotImplementedError
         else:
