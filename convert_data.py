@@ -56,8 +56,10 @@ def main():
         save_path = get_save_path(args.data_dir, env_config)
     else:
         save_path = args.save_path
+    print(f'saving jsons to {save_path}')
 
     for env_name in env_list:
+        print(f'Writing data to json files for environment {env_name}')
         write_jsons(env_name, args.data_dir, env_config, save_path, args.preprocess)
 
 
