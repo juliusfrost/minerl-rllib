@@ -14,12 +14,22 @@ class MinerRLDataEnv(gym.Env):
         self.action_space = self.env_spec.action_space
         self.trajectory_names = data_pipeline.get_trajectory_names()
         self.index = 0
-        self.iterator = None
+        # used by step() and reset()
+        self.trajectory = None
+        self.step_index = 0
 
     def step(self, action):
-        obs, action, reward, next_obs, done = self.trajectory[self.step_index]
+        prev_obs, action, reward, obs, done = self.trajectory[self.step_index]
+        info = {
+            'prev_obs': prev_obs,
+            'action': action,
+        }
         self.step_index += 1
-        pass
+        if self.step_index >= len(self.trajectory):
+            if not done:
+                print('Encountered end of trajectory when done returned False!')
+            done = True
+        return obs, reward, done, info
 
     def reset(self):
         self.trajectory = list(self.data_pipeline.load_data(self.trajectory_names[0]))
