@@ -87,7 +87,7 @@ def write_jsons(environment, data_dir, env_config, preprocess=False, **kwargs):
                 prev_actions=prev_action,
                 prev_rewards=prev_reward,
                 dones=done,
-                infos=info,
+                infos={},
                 new_obs=prep.transform(new_obs) if preprocess else new_obs
             )
             prev_action = action
