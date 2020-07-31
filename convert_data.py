@@ -48,7 +48,7 @@ def main():
         env_list.append(args.env)
 
     for env_name in env_list:
-        write_jsons(env_name, args.data_dir, env_config, save_path)
+        write_jsons(env_name, args.data_dir, env_config, save_path, args.preprocess)
 
 
 if __name__ == '__main__':
