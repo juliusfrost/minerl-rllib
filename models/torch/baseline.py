@@ -18,10 +18,15 @@ BASELINE_CONFIG = {
     # specifies the type of rnn layer
     # implemented: [gru, lstm]
     'rnn_type': 'gru',
-    # specifies the number of rnn layers
-    'rnn_layers': 1,
     # specifies whether to include the previous action and reward as part of the observation
     'use_prev_action_reward': True,
+    # specifies extra key word arguments for the RNN class
+    'rnn_config': {
+        # specifies the rnn hidden layer size
+        'hidden_size': 512,
+        # specifies the number of rnn layers
+        'num_layers': 1,
+    },
 
     # specifies the network architecture for pov image observations
     # gets the pov network factory method from pov.py
@@ -64,15 +69,17 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
     Baseline MineRL PyTorch Model
     See rllib documentation on custom models: https://docs.ray.io/en/master/rllib-models.html#pytorch-models
     """
-    def __init__(self, obs_space, action_space, num_outputs, model_config, name):
+
+    def __init__(self, obs_space, action_space, num_outputs, model_config, name, **kwargs):
         TorchModelV2.__init__(self, obs_space, action_space, num_outputs, model_config, name)
         nn.Module.__init__(self)
         model_config = merge_dicts(BASELINE_CONFIG, model_config['custom_model_config'])
+        # new way to get model config directly from keyword arguments
+        model_config = merge_dicts(model_config, kwargs)
 
         state_embed_size = model_config['state_embed_size']
         self.use_rnn = model_config['use_rnn']
         rnn_type = model_config['rnn_type']
-        rnn_layers = model_config['rnn_layers']
         self.use_prev_action_reward = model_config['use_prev_action_reward']
 
         action_net_kwargs = model_config['action_net_kwargs']
@@ -93,11 +100,15 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
             self._reward_network, reward_embed_size = get_factory('reward')(**model_config['reward_net_kwargs'])
             state_input_size += action_embed_size + reward_embed_size
 
+        rnn_config = model_config.get('rnn_config')
         if self.use_rnn:
+            state_embed_size = rnn_config['hidden_size']
             if rnn_type == 'lstm':
-                self._rnn = models.torch.rnn.LSTMBaseline(state_input_size, state_embed_size, rnn_layers)
+                self._rnn = models.torch.rnn.LSTMBaseline(state_input_size, **rnn_config)
             elif rnn_type == 'gru':
-                self._rnn = models.torch.rnn.GRUBaseline(state_input_size, state_embed_size, rnn_layers)
+                self._rnn = models.torch.rnn.GRUBaseline(state_input_size, **rnn_config)
+            elif rnn_type == 'hrvae':
+                self._rnn = models.torch.hierarchical_recurrent_vae.HRVAE(state_input_size, **rnn_config)
             else:
                 raise NotImplementedError
         else:
@@ -164,6 +175,11 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
 
     def import_from_h5(self, h5_file):
         raise NotImplementedError
+
+    def custom_loss(self, policy_loss, loss_inputs):
+        if self.use_rnn:
+            return [policy_loss[0] + self._rnn.custom_loss()]
+        return policy_loss
 
 
 def register():
