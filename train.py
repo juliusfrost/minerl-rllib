@@ -16,6 +16,7 @@ from ray.tune.tune import _make_scheduler, run_experiments
 from ray.tune.utils import merge_dicts
 
 import models
+from convert_data import get_save_path
 
 models.register()
 
@@ -149,7 +150,7 @@ def create_parser(parser_creator=None):
     parser.add_argument('--data-dir', type=Path, default=os.getenv('MINERL_DATA_ROOT', 'data'),
                         help='Path to MineRL data directory')
     parser.add_argument('--mode', choices=['online', 'offline', 'mixed'], default='online')
-    parser.add_argument('--mixing-ratio', default=0.5,
+    parser.add_argument('--data-ratio', default=0.8,
                         help='How much to sample from data over the environment')
     parser.add_argument('--debug', action='store_true')
     return parser
@@ -176,19 +177,6 @@ def run(args, parser):
         experiments = {}
         for experiment_name, experiment_settings in config_dict.items():
             config = dict(args.config, env=args.env)
-
-            # TODO: implement
-            if args.mode == 'offline':
-                config.update(dict(
-                    explore=False,
-                    input=args.data_path,
-                    input_evaluation=['simulation'],
-                ))
-            elif args.mode == 'mixed':
-                config.update(dict(
-                    input={args.data_path: args.mixing_ratio, 'sample': (1 - args.mixing_ratio)},
-                    input_evaluation=['simulation'],
-                ))
 
             if 'time_total_s' not in args.stop:
                 # The MineRL competition training time limit is 4 days. Subtract an hour for evaluation.
@@ -222,6 +210,28 @@ def run(args, parser):
             }
             # overwrite the settings from arguments with those in the experiment config file
             settings = merge_dicts(settings_from_args, experiment_settings)
+
+            # get merged env_config for configuring the json data path
+            env_config = {}
+            if 'env_config' in settings['config']:
+                env_config = settings['config']['env_config']
+            env_name = settings['config']['env']
+            json_path = get_save_path(args.data_dir, env_config, env_name)
+
+            if args.mode == 'offline':
+                offline_config = {
+                    'explore': False,
+                    'input': json_path,
+                    'input_evaluation': ['simulation'],
+                }
+                settings['config'] = merge_dicts(settings['config'], offline_config)
+            elif args.mode == 'mixed':
+                mixed_config = {
+                    'input': {json_path: args.data_ratio, 'sample': (1 - args.mixing_ratio)},
+                    'input_evaluation': ['simulation'],
+                }
+                settings['config'] = merge_dicts(settings['config'], mixed_config)
+
             experiments.update({experiment_name: settings})
 
         if any('MineRL' in setting['config']['env'] for setting in experiments.values()):
