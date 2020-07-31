@@ -4,6 +4,7 @@ import os
 
 import yaml
 from minerl.herobraine.envs import obfuscated_envs
+from ray.tune.utils import merge_dicts
 
 from envs.data import write_jsons
 
@@ -40,6 +41,7 @@ def main():
                 env_list.append(settings['config']['env'])
         if 'env' in settings:
             env_list.append(settings['env'])
+    env_config = merge_dicts(env_config, args.env_config)
 
     if args.env is None and len(env_list) == 0:
         for env_spec in obfuscated_envs:
