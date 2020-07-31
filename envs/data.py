@@ -1,6 +1,12 @@
+import os
+
 import gym
 import minerl
+import numpy as np
+from ray.rllib.evaluation.sample_batch_builder import SampleBatchBuilder
+from ray.rllib.models.preprocessors import get_preprocessor
 from ray.rllib.offline import InputReader
+from ray.rllib.offline.json_writer import JsonWriter
 
 from envs.wrappers import wrap
 
@@ -43,8 +49,51 @@ class MinerRLDataEnv(gym.Env):
         pass
 
 
-def get_env(env: MinerRLDataEnv, env_config):
+def wrap_env(env: MinerRLDataEnv, env_config):
     return wrap(env, **env_config)
+
+
+def write_jsons(environment, data_dir, env_config, preprocess=False, **kwargs):
+    data_pipeline = minerl.data.make(environment, data_dir, **kwargs)
+    env = MinerRLDataEnv(data_pipeline)
+    env = wrap_env(env, env_config)
+
+    save_path = os.path.join(data_dir, 'rllib')
+    batch_builder = SampleBatchBuilder()
+    writer = JsonWriter(os.path.join(save_path, environment))
+    prep = get_preprocessor(env.observation_space)(env.observation_space)
+    for trajectory in env.trajectory_names:
+        t = 0
+        prev_action = None
+        prev_reward = 0
+        done = False
+        obs = env.reset()
+        info = None
+        while not done:
+            new_obs, reward, done, info = env.step(env.action_space.sample())
+            action = info['action']
+            obs = info['prev_obs']
+            if prev_action is None:
+                prev_action = np.zeros_like(action)
+
+            batch_builder.add_values(
+                t=t,
+                eps_id=trajectory,
+                agent_index=0,
+                obs=prep.transform(obs) if preprocess else obs,
+                actions=action,
+                action_prob=1.0,  # put the true action probability here
+                rewards=reward,
+                prev_actions=prev_action,
+                prev_rewards=prev_reward,
+                dones=done,
+                infos=info,
+                new_obs=prep.transform(new_obs) if preprocess else new_obs
+            )
+            prev_action = action
+            prev_reward = reward
+            t += 1
+        writer.write(batch_builder.build_and_reset())
 
 
 class MineRLReader(InputReader):
