@@ -71,7 +71,9 @@ def write_jsons(environment, data_dir, env_config, save_path, preprocess=False, 
         while not done:
             new_obs, reward, done, info = env.step(env.action_space.sample())
             action = info['action']
+            action = env.reverse_action(action)
             obs = info['prev_obs']
+            obs = env.observation(obs)
             if prev_action is None:
                 prev_action = np.zeros_like(action)
 
