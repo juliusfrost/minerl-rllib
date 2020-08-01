@@ -38,7 +38,7 @@ class MinerRLDataEnv(gym.Env):
         return obs, reward, done, info
 
     def reset(self):
-        self.trajectory = list(self.data_pipeline.load_data(self.trajectory_names[0]))
+        self.trajectory = list(self.data_pipeline.load_data(self.trajectory_names[self.index]))
         self.index += 1
         self.index %= len(self.trajectory_names)
         self.step_index = 0
