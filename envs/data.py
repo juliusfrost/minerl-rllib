@@ -53,7 +53,7 @@ def wrap_env(env: MinerRLDataEnv, env_config):
     return wrap(env, **env_config)
 
 
-def write_jsons(environment, data_dir, env_config, save_path, preprocess=False, **kwargs):
+def write_jsons(environment, data_dir, env_config, save_path, **kwargs):
     data_pipeline = minerl.data.make(environment, data_dir, **kwargs)
     env = MinerRLDataEnv(data_pipeline)
     env = wrap_env(env, env_config)
@@ -79,7 +79,7 @@ def write_jsons(environment, data_dir, env_config, save_path, preprocess=False, 
                 t=t,
                 eps_id=trajectory,
                 agent_index=0,
-                obs=prep.transform(obs) if preprocess else obs,
+                obs=prep.transform(obs),
                 actions=action,
                 action_prob=1.0,  # put the true action probability here
                 rewards=reward,
@@ -87,7 +87,7 @@ def write_jsons(environment, data_dir, env_config, save_path, preprocess=False, 
                 prev_rewards=prev_reward,
                 dones=done,
                 infos={},
-                new_obs=prep.transform(new_obs) if preprocess else new_obs
+                new_obs=prep.transform(new_obs),
             )
             obs = new_obs
             prev_action = action

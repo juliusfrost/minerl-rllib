@@ -14,7 +14,6 @@ parser.add_argument('--data-dir', type=str, default=os.getenv('MINERL_DATA_ROOT'
 parser.add_argument('--save-path', default=None, type=str,
                     help='directory to write jsons. defaults to the rllib subdirectory of the MineRL data path')
 parser.add_argument('--env', type=str, default=None, help='Environment name to write jsons')
-parser.add_argument('--preprocess', action='store_true', help='whether to preprocess observations')
 parser.add_argument('--config-file', default=None, type=str, help='config file to load environment config')
 parser.add_argument('--env-config', default='{}', type=json.loads,
                     help='specifies environment configuration options. overrides config file specifications')
@@ -62,9 +61,7 @@ def main():
 
     for env_name in env_list:
         print(f'Writing data to json files for environment {env_name}')
-        env_save_path = os.path.join(save_path, env_name)
-        print(f'Saving to {env_save_path}')
-        write_jsons(env_name, args.data_dir, env_config, env_save_path, args.preprocess)
+        write_jsons(env_name, args.data_dir, env_config, save_path)
 
 
 if __name__ == '__main__':
