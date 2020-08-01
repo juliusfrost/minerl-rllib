@@ -227,7 +227,7 @@ def run(args, parser):
                 settings['config'] = merge_dicts(settings['config'], offline_config)
             elif args.mode == 'mixed':
                 mixed_config = {
-                    'input': {json_path: args.data_ratio, 'sample': (1 - args.mixing_ratio)},
+                    'input': {json_path: args.data_ratio, 'sample': (1 - args.data_ratio)},
                     'input_evaluation': ['simulation'],
                 }
                 settings['config'] = merge_dicts(settings['config'], mixed_config)
