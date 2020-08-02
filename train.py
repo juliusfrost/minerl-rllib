@@ -24,6 +24,8 @@ models.register()
 tf1, tf, tfv = try_import_tf()
 torch, _ = try_import_torch()
 
+ROOT_DIR = os.path.abspath(os.path.basename(__file__))
+
 DEFAULT_RESULTS_DIR = 'results'
 
 EXAMPLE_USAGE = """
@@ -217,18 +219,17 @@ def run(args, parser):
                 env_config = settings['config']['env_config']
             env_name = settings['config']['env']
             json_path = get_save_path(args.data_dir, env_config, env_name)
+            json_path = os.path.abspath(json_path)
 
             if args.mode == 'offline':
                 offline_config = {
                     'explore': False,
                     'input': json_path,
-                    'input_evaluation': ['simulation'],
                 }
                 settings['config'] = merge_dicts(settings['config'], offline_config)
             elif args.mode == 'mixed':
                 mixed_config = {
-                    'input': {json_path: args.data_ratio, 'sample': (1 - args.data_ratio)},
-                    'input_evaluation': ['simulation'],
+                    'input': {json_path: args.data_ratio, 'sampler': (1 - args.data_ratio)},
                 }
                 settings['config'] = merge_dicts(settings['config'], mixed_config)
 
@@ -249,12 +250,18 @@ def run(args, parser):
         # Bazel makes it hard to find files specified in `args` (and `data`).
         # Look for them here.
         # NOTE: Some of our yaml files don't have a `config` section.
-        if exp.get("config", {}).get("input") and \
-                not os.path.exists(exp["config"]["input"]):
-            # This script runs in the ray/rllib dir.
-            rllib_dir = Path(__file__).parent
-            input_file = rllib_dir.absolute().joinpath(exp["config"]["input"])
-            exp["config"]["input"] = str(input_file)
+        if 'input' in exp.get('config', {}):
+            inputs = exp['config']['input']
+            if isinstance(inputs, dict):
+                for path, ratio in inputs.items():
+                    if not os.path.exists(path) and path != 'sampler':
+                        input_file = os.path.join(ROOT_DIR, path)
+                        print(input_file)
+                        del exp['config']['input'][path]
+                        exp['config']['input'][input_file] = ratio
+            elif not os.path.exists(inputs):
+                input_file = os.path.join(ROOT_DIR, exp['config']['input'])
+                exp['config']['input'] = str(input_file)
 
         if not exp.get("run"):
             parser.error("the following arguments are required: --run")
