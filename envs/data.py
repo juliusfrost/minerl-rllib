@@ -66,8 +66,10 @@ def write_jsons(environment, data_dir, env_config, save_path, **kwargs):
         prev_action = None
         prev_reward = 0
         done = False
-        obs = env.reset()
-        info = None
+        try:
+            obs = env.reset()
+        except TypeError:
+            continue
         while not done:
             new_obs, reward, done, info = env.step(env.action_space.sample())
             action = info['action']
