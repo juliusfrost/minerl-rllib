@@ -62,8 +62,6 @@ def main():
     for env_name in env_list:
         print(f'Writing data to json files for environment {env_name}')
         env_save_path = os.path.join(save_path, env_name)
-        if not os.path.exists(env_save_path):
-            os.makedirs(env_save_path)
         write_jsons(env_name, args.data_dir, env_config, env_save_path)
 
 

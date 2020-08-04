@@ -61,6 +61,10 @@ def write_jsons(environment, data_dir, env_config, save_path, **kwargs):
     batch_builder = SampleBatchBuilder()
     writer = JsonWriter(save_path)
     prep = get_preprocessor(env.observation_space)(env.observation_space)
+
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
     for trajectory in env.trajectory_names:
         t = 0
         prev_action = None
