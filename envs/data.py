@@ -60,12 +60,15 @@ def write_jsons(environment, data_dir, env_config, save_path, **kwargs):
 
     if not os.path.exists(save_path):
         os.makedirs(save_path)
+    if len(os.listdir(save_path)) != 0:
+        raise ValueError(f'Directory {os.path.abspath(save_path)} not empty!'
+                         f'Cannot overwrite existing data automatically, please delete old data if unused.')
 
     batch_builder = SampleBatchBuilder()
     writer = JsonWriter(save_path)
     prep = get_preprocessor(env.observation_space)(env.observation_space)
 
-    for trajectory in env.trajectory_names:
+    for eps_id, trajectory_name in enumerate(env.trajectory_names):
         t = 0
         prev_action = None
         prev_reward = 0
@@ -83,7 +86,7 @@ def write_jsons(environment, data_dir, env_config, save_path, **kwargs):
 
             batch_builder.add_values(
                 t=t,
-                eps_id=trajectory,
+                eps_id=eps_id,
                 agent_index=0,
                 obs=prep.transform(obs),
                 actions=action,
@@ -92,7 +95,7 @@ def write_jsons(environment, data_dir, env_config, save_path, **kwargs):
                 prev_actions=prev_action,
                 prev_rewards=prev_reward,
                 dones=done,
-                infos={},
+                infos={'trajectory_name': trajectory_name},
                 new_obs=prep.transform(new_obs),
             )
             obs = new_obs
