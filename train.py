@@ -226,11 +226,15 @@ def run(args, parser):
                 offline_config = {
                     'explore': False,
                     'input': json_path,
+                    'postprocess_inputs': True,
+                    'shuffle_buffer_size': 32,
                 }
                 settings['config'] = merge_dicts(settings['config'], offline_config)
             elif args.mode == 'mixed':
                 mixed_config = {
                     'input': {json_path: args.data_ratio, 'sampler': (1 - args.data_ratio)},
+                    'postprocess_inputs': True,
+                    'shuffle_buffer_size': 32,
                 }
                 settings['config'] = merge_dicts(settings['config'], mixed_config)
 
