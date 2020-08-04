@@ -220,6 +220,7 @@ def run(args, parser):
             env_name = settings['config']['env']
             json_path = get_save_path(args.data_dir, env_config, env_name)
             json_path = os.path.abspath(json_path)
+            json_path = os.path.join(json_path, '*.json')
 
             if args.mode == 'offline':
                 offline_config = {
