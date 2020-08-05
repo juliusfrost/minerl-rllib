@@ -21,8 +21,8 @@ from convert_data import get_save_path
 models.register()
 
 # Try to import both backends for flag checking/warnings.
-tf1, tf, tfv = try_import_tf()
-torch, _ = try_import_torch()
+# tf1, tf, tfv = try_import_tf()
+# torch, _ = try_import_torch()
 
 ROOT_DIR = os.path.abspath(os.path.basename(__file__))
 
