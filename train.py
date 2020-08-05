@@ -20,8 +20,8 @@ import models
 models.register()
 
 # Try to import both backends for flag checking/warnings.
-tf1, tf, tfv = try_import_tf()
-torch, _ = try_import_torch()
+# tf1, tf, tfv = try_import_tf()
+# torch, _ = try_import_torch()
 
 DEFAULT_RESULTS_DIR = 'results'
 
