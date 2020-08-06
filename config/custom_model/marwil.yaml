@@ -1,0 +1,16 @@
+cartpole-marwil:
+    run: MARWIL
+    config:
+        framework: torch
+        model:
+            custom_model: minerl_torch_model
+
+        # In order to evaluate on an actual environment, use these following
+        # settings:
+#        evaluation_num_workers: 1
+#        evaluation_interval: 1
+#        evaluation_config:
+#            input: sampler
+        # Compare IL (beta=0) vs MARWIL.
+#        beta:
+#            grid_search: [0, 1]
