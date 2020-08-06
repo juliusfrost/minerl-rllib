@@ -1,4 +1,4 @@
-cartpole-marwil:
+minerl-marwil:
     run: MARWIL
     config:
         framework: torch
