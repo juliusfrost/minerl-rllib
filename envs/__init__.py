@@ -1,11 +1,41 @@
 import copy
 import os
 
+import filelock
+import gym
 import minerl
 from ray.tune.registry import register_env
 
 from envs.env import MineRLRandomDebugEnv
 from envs.wrappers import wrap
+
+
+class LazyMineRLEnv(gym.Env):
+    def __init__(self, *args, **kwargs):
+        self._args = args
+        self._kwargs = kwargs
+        self._env = None
+        self.observation_space = kwargs.get('observation_space')
+        self.action_space = kwargs.get('action_space')
+        self.env_spec = kwargs.get('env_spec')
+        super().__init__()
+
+    def reset(self, **kwargs):
+        if self._env is None:
+            with filelock.FileLock('minerl_env.lock'):
+                self._env = minerl.env.MineRLEnv(*self._args, **self._kwargs)
+        return self._env.reset()
+
+    def step(self, action):
+        return self._env.step(action)
+
+    def render(self, mode='human'):
+        return self._env.render(mode)
+
+    def __getattr__(self, name):
+        if name.startswith('_'):
+            raise AttributeError("attempted to get missing private attribute '{}'".format(name))
+        return getattr(self._env, name)
 
 
 def register(discrete=False, num_actions=32, data_dir=None, **kwargs):
@@ -26,7 +56,7 @@ def register(discrete=False, num_actions=32, data_dir=None, **kwargs):
 
         def env_creator(env_config):
             wrap_kwargs.update(env_config)
-            return wrap(minerl.env.MineRLEnv(**env_kwargs), **wrap_kwargs)
+            return wrap(LazyMineRLEnv(**env_kwargs), **wrap_kwargs)
 
         register_env(env_spec.name, env_creator)
 
