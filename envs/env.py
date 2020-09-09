@@ -1,6 +1,35 @@
+import filelock
 import gym
 import gym.wrappers
 import minerl
+
+
+class LazyMineRLEnv(gym.Env):
+    def __init__(self, *args, **kwargs):
+        self._args = args
+        self._kwargs = kwargs
+        self._env = None
+        self.observation_space = kwargs.get('observation_space')
+        self.action_space = kwargs.get('action_space')
+        self.env_spec = kwargs.get('env_spec')
+        super().__init__()
+
+    def reset(self, **kwargs):
+        if self._env is None:
+            with filelock.FileLock('minerl_env.lock'):
+                self._env = minerl.env.MineRLEnv(*self._args, **self._kwargs)
+        return self._env.reset()
+
+    def step(self, action):
+        return self._env.step(action)
+
+    def render(self, mode='human'):
+        return self._env.render(mode)
+
+    def __getattr__(self, name):
+        if name.startswith('_'):
+            raise AttributeError("attempted to get missing private attribute '{}'".format(name))
+        return getattr(self._env, name)
 
 
 class MineRLRandomDebugEnv(gym.Env):
