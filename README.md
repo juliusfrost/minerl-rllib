@@ -7,19 +7,18 @@ RLlib natively supports TensorFlow, TensorFlow Eager, and PyTorch, but most of i
 
 ## Installation
 
-OS: Linux  
-If you want to run on Windows, you can install the ray nightly version, but some RL algorithms may break.
+1. Make sure you have JDK 1.8 on your system for [MineRL](https://minerl.io/docs/tutorials/index.html#installation).
+2. Install [PyTorch](https://pytorch.org/get-started/locally/) and [TensorFlow](https://www.tensorflow.org/install) with correct cuda version
+3. Install [Ray Latest Snapshots (Nightlies)](https://docs.ray.io/en/master/installation.html#latest-snapshots-nightlies) 
+4. Finally, 
+```
+git clone https://github.com/juliusfrost/minerl-rllib.git
+cd minerl-rllib
+pip install -r requirements.txt
+```
 
-Make sure you have JDK 1.8 on your system for MineRL.
+### Parallel Environments
 
-Install [PyTorch](https://pytorch.org/get-started/locally/) and [TensorFlow](https://www.tensorflow.org/install) with correct cuda version, then
-`pip install -r requirements.txt`
-
-## Experiments
-
-See [Planned Implementation Details](Implementation.md)
-
-Currently experiments do not support headless mode.  
 Multiprocessing is available but not merged into minerl ([see this pull](https://github.com/minerllabs/minerl/pull/352)). For now, do
 ```
 git clone https://github.com/minerllabs/minerl.git
@@ -29,17 +28,31 @@ git checkout process-safe
 pip install -e .
 ```
 
-For discrete action spaces, make sure you have the environment variable `MINERL_DATA_ROOT` set, otherwise it defaults to `data`. Then, run `python generate_kmeans.py`
+## Implementation Details
+See [Planned Implementation Details](Implementation.md)
 
-### Online Reinforcement Learning [WIP]
-This is the standard reinforcement learning agent-environment loop.
+For discrete action spaces, make sure you have the environment variable `MINERL_DATA_ROOT` set, 
+otherwise it defaults to the `data` folder. 
+Then, run `python generate_kmeans.py`
 
-Example:
-`python train.py --experiment custom_model/impala`
+### Configuration
 
-### Offline Reinforcement Learning [TODO]
-As human demonstrations available in MineRL, it is possible to increase sample efficiency by using them to learn a better policy. 
-This section is dedicated to offline sampling from the dataset only and does not sample from the environment.
+This repository comes with a modular configuration system.
+We specify configuration `yaml` files according to the rllib specification.
+You can see an example config at `config/minerl-impala-debug.yaml`
 
-### Mixed: Online Reinforcement Learning with Offline Data [TODO]
-One can try to get the best of both worlds of online and offline RL, by learning when data is already available and sampling for exploration. 
+### Training
+We use `rllib_train.py` to train our RL algorithm on MineRL.
+The easiest way to get started is to specify all of your configurations first as stated in the previous section.
+See help with `python rllib_train.py --help`
+
+Here is an example command:
+```
+python rllib_train.py -f config/minerl-impala-debug.yaml
+```
+This will run the IMPALA RL algorithm on the MineRL Debug Environment,
+which has the same observation space and action space as the competition environments 
+but doesn't run Minecraft explicitly.
+
+### Testing
+See help with `python rllib_test.py --help`
