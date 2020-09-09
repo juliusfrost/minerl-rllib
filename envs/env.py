@@ -20,7 +20,7 @@ class MineRLRandomDebugEnv(gym.Env):
 
     def step(self, action):
         obs = self._obs()
-        reward = 0
+        reward = 0.
         if self.t < 100:
             self.done = False
         else:
