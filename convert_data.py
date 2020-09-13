@@ -37,7 +37,7 @@ def main():
     env_config = {}
     if args.config_file is not None:
         config = yaml.safe_load(open(args.config_file))
-        settings = config[list(config.keys())[0]]
+        settings = list(config.values())[0]
         if 'config' in settings:
             if 'env_config' in settings['config']:
                 env_config = settings['config']['env_config']
