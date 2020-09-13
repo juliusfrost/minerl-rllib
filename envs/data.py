@@ -62,10 +62,12 @@ def write_jsons(environment, data_dir, env_config, save_path, overwrite=False, *
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     if len(os.listdir(save_path)) != 0:
+        abs_save_path = os.path.abspath(save_path)
         if overwrite:
-            shutil.rmtree(os.path.abspath(save_path))
+            print(f'Overwriting! {abs_save_path}')
+            shutil.rmtree(abs_save_path)
         else:
-            raise ValueError(f'Directory {os.path.abspath(save_path)} not empty!'
+            raise ValueError(f'Directory {abs_save_path} not empty!'
                              f'Cannot overwrite existing data automatically, please delete old data if unused.')
 
     batch_builder = SampleBatchBuilder()
