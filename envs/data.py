@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import gym
 import minerl
@@ -53,7 +54,7 @@ def wrap_env(env: MinerRLDataEnv, env_config):
     return wrap(env, **env_config)
 
 
-def write_jsons(environment, data_dir, env_config, save_path, overwrite=True, **kwargs):
+def write_jsons(environment, data_dir, env_config, save_path, overwrite=False, **kwargs):
     data_pipeline = minerl.data.make(environment, data_dir, **kwargs)
     env = MinerRLDataEnv(data_pipeline)
     env = wrap_env(env, env_config)
@@ -62,7 +63,7 @@ def write_jsons(environment, data_dir, env_config, save_path, overwrite=True, **
         os.makedirs(save_path)
     if len(os.listdir(save_path)) != 0:
         if overwrite:
-            os.removedirs(os.path.abspath(save_path))
+            shutil.rmtree(os.path.abspath(save_path))
         else:
             raise ValueError(f'Directory {os.path.abspath(save_path)} not empty!'
                              f'Cannot overwrite existing data automatically, please delete old data if unused.')
