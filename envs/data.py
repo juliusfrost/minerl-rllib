@@ -53,7 +53,7 @@ def wrap_env(env: MinerRLDataEnv, env_config):
     return wrap(env, **env_config)
 
 
-def write_jsons(environment, data_dir, env_config, save_path, **kwargs):
+def write_jsons(environment, data_dir, env_config, save_path, overwrite=True, **kwargs):
     data_pipeline = minerl.data.make(environment, data_dir, **kwargs)
     env = MinerRLDataEnv(data_pipeline)
     env = wrap_env(env, env_config)
@@ -61,8 +61,11 @@ def write_jsons(environment, data_dir, env_config, save_path, **kwargs):
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     if len(os.listdir(save_path)) != 0:
-        raise ValueError(f'Directory {os.path.abspath(save_path)} not empty!'
-                         f'Cannot overwrite existing data automatically, please delete old data if unused.')
+        if overwrite:
+            os.removedirs(os.path.abspath(save_path))
+        else:
+            raise ValueError(f'Directory {os.path.abspath(save_path)} not empty!'
+                             f'Cannot overwrite existing data automatically, please delete old data if unused.')
 
     batch_builder = SampleBatchBuilder()
     writer = JsonWriter(save_path)
