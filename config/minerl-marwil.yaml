@@ -1,7 +1,7 @@
 # use this config with $ python rllib_train.py -f config/minerl-impala-debug.yaml
 # see Experiment.spec for valid config options:
 # https://docs.ray.io/en/master/_modules/ray/tune/experiment.html#Experiment
-minerl-impala-debug: # name of the experiment - name of the folder in results
+minerl-marwil: # name of the experiment - name of the folder in results
     run: MARWIL # RL Algorithm
     env: MineRLObtainDiamondVectorObf-v0 # MineRL Environment
     stop:
