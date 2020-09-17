@@ -18,7 +18,7 @@ pip install -r requirements.txt
 ```
 
 ## Implementation Details
-See [Planned Implementation Details](Implementation.md)
+See [Implementation Details](Implementation.md)
 
 For discrete action spaces, make sure you have the environment variable `MINERL_DATA_ROOT` set, 
 otherwise it defaults to the `data` folder. 

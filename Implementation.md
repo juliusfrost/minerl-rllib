@@ -1,4 +1,4 @@
-# MineRL RLlib Baselines (Planned) Implementation
+# MineRL RLlib Baselines Implementation Goals
 
 ## Environments
 ### Treechop
@@ -11,7 +11,7 @@
 4. `MineRLNavigateExtremeDenseVectorObf-v0`
 
 ### Obtain Diamond
-1. `MineRLObtainDiamondVectorObf-v0`
+1. `MineRLObtainDiamondVectorObf-v0` (competition evaluation task)
 2. `MineRLObtainDiamondDenseVectorObf-v0`
 
 ### Obtain Iron Pickaxe
@@ -20,10 +20,10 @@ However using this category human data may be valuable.
 1. `MineRLObtainIronPickaxeVectorObf-v0`
 2. `MineRLObtainIronPickaxeDenseVectorObf-v0`
 
-## Metrics
+## Metrics (TODO)
 1. Final episode reward
 2. Final episode reward with human normalized performance
-3. Sample efficiency (0, 100k, 500k, 1M, 8M)
+3. Sample efficiency (0, 100k, 1M, 8M)
 4. Episode reward curves
 
 ## Action Space
@@ -31,7 +31,7 @@ However using this category human data may be valuable.
     1. Naturally supported by minerl vector actions (64,)
 2. Discrete
     1. [K-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) on human data and use as discretized action space
-    2. [Locality Sensitive Hashing](https://en.wikipedia.org/wiki/Locality-sensitive_hashing) to map data to discrete actions
+    2. Helps lessen the exploration problem with a cost of restricting the action space
 
 ## Observation Space
 1. Tuple Observations (Image (64,64,3), vector (64,))
