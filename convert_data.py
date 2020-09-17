@@ -14,7 +14,7 @@ parser.add_argument('--data-dir', type=str, default=os.getenv('MINERL_DATA_ROOT'
 parser.add_argument('--save-path', default=None, type=str,
                     help='directory to write jsons. defaults to the rllib subdirectory of the MineRL data path')
 parser.add_argument('--env', type=str, default=None, help='Environment name to write jsons')
-parser.add_argument('--config-file', default=None, type=str, help='config file to load environment config')
+parser.add_argument('-f', '--config-file', default=None, type=str, help='config file to load environment config')
 parser.add_argument('--env-config', default='{}', type=json.loads,
                     help='specifies environment configuration options. overrides config file specifications')
 parser.add_argument('--overwrite', action='store_true', help='overwrite existing data if directory not empty')

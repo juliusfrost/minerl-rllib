@@ -17,17 +17,6 @@ cd minerl-rllib
 pip install -r requirements.txt
 ```
 
-### Parallel Environments
-
-Multiprocessing is available but not merged into minerl ([see this pull](https://github.com/minerllabs/minerl/pull/352)). For now, do
-```
-git clone https://github.com/minerllabs/minerl.git
-cd minerl
-git fetch origin pull/352/head:process-safe
-git checkout process-safe
-pip install -e .
-```
-
 ## Implementation Details
 See [Planned Implementation Details](Implementation.md)
 
@@ -40,6 +29,30 @@ Then, run `python generate_kmeans.py`
 This repository comes with a modular configuration system.
 We specify configuration `yaml` files according to the rllib specification.
 You can see an example config at `config/minerl-impala-debug.yaml`
+
+### Data
+#### Downloading the MineRL dataset
+Follow the official instructions: https://minerl.io/dataset/  
+If you download the data to `./data` then you don't need to set `MINERL_DATA_ROOT` in your environment variables.
+
+#### Discrete Action Space with K-means clustering
+You can use a discrete action space by running the `generate_kmeans.py` script. For example,
+```
+python generate_kmeans.py --num-actions 32 --env MineRLObtainDiamondVectorObf-v0
+```
+Then to use discrete actions with your agent, set `discrete: true` in the `env_config` of your config file.
+
+#### Input data to your RLLib algorithm
+To feed data to your rllib algorithm, you must first convert the minerl dataset into the json format 
+that is specified by the [RLLib Input API](https://docs.ray.io/en/master/rllib-offline.html#input-api).
+Use the `convert_data.py` script to convert the data into the correct format. 
+You can specify the environment configuration `env_config` 
+with either the `-f` / `--config-file` or `--env-config` flag.
+Example:
+```
+# if you use an env_config different from the default settings, you must specify it 
+python convert_data.py --env MineRLObtainDiamondVectorObf-v0 -f example_config.yaml
+```
 
 ### Training
 We use `rllib_train.py` to train our RL algorithm on MineRL.
