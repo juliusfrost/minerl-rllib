@@ -46,13 +46,13 @@ def main():
                 env_list.append(settings['config']['env'])
         if 'env' in settings:
             env_list.append(settings['env'])
-    env_config = merge_dicts(env_config, args.env_config)
-
-    if args.env is None and len(env_list) == 0:
-        for env_spec in obfuscated_envs:
-            env_list.append(env_spec.name)
     else:
-        env_list.append(args.env)
+        if args.env is None:
+            for env_spec in obfuscated_envs:
+                env_list.append(env_spec.name)
+        else:
+            env_list.append(args.env)
+    env_config = merge_dicts(env_config, args.env_config)
 
     if args.save_path is None:
         save_path = get_save_path(args.data_dir, env_config)
