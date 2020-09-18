@@ -1,81 +1,69 @@
 import argparse
+import json
 import os
 
-import gym
-import minerl
-import numpy as np
-from ray.rllib.evaluation.sample_batch_builder import SampleBatchBuilder
-from ray.rllib.models.preprocessors import get_preprocessor
-from ray.rllib.offline.json_writer import JsonWriter
+import yaml
+from minerl.herobraine.envs import obfuscated_envs
+from ray.tune.utils import merge_dicts
 
-from envs import register
+from envs.data import write_jsons
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data-path', default=os.getenv('MINERL_DATA_ROOT', 'data'))
-parser.add_argument('--save-path', default=None)
-parser.add_argument('--env', default=None)
+parser.add_argument('--data-dir', type=str, default=os.getenv('MINERL_DATA_ROOT', 'data'),
+                    help='path to the data directory of the MineRL data')
+parser.add_argument('--save-path', default=None, type=str,
+                    help='directory to write jsons. defaults to the rllib subdirectory of the MineRL data path')
+parser.add_argument('--env', type=str, default=None, help='Environment name to write jsons')
+parser.add_argument('-f', '--config-file', default=None, type=str, help='config file to load environment config')
+parser.add_argument('--env-config', default='{}', type=json.loads,
+                    help='specifies environment configuration options. overrides config file specifications')
+parser.add_argument('--overwrite', action='store_true', help='overwrite existing data if directory not empty')
+
+
+def get_save_path(data_dir, env_config, env_name=None):
+    save_dir = 'env-config'
+    for key, value in env_config.items():
+        save_dir += f'--{key}-{value}'
+    save_path = os.path.join(data_dir, 'rllib', save_dir)
+    if env_name is not None:
+        save_path = os.path.join(save_path, env_name)
+    return save_path
 
 
 def main():
     args = parser.parse_args()
 
+    env_list = []
+
+    env_config = {}
+    if args.config_file is not None:
+        config = yaml.safe_load(open(args.config_file))
+        settings = list(config.values())[0]
+        if 'config' in settings:
+            if 'env_config' in settings['config']:
+                env_config = settings['config']['env_config']
+            if 'env' in settings['config']:
+                env_list.append(settings['config']['env'])
+        if 'env' in settings:
+            env_list.append(settings['env'])
+    else:
+        if args.env is None:
+            for env_spec in obfuscated_envs:
+                env_list.append(env_spec.name)
+        else:
+            env_list.append(args.env)
+    env_config = merge_dicts(env_config, args.env_config)
+
     if args.save_path is None:
-        save_path = os.path.join(args.data_path, 'rllib')
+        save_path = get_save_path(args.data_dir, env_config)
     else:
         save_path = args.save_path
-
-    if args.env is None:
-        env_list = []
-        for env_spec in minerl.herobraine.envs.obfuscated_envs:
-            env_list.append(env_spec.name)
-    else:
-        env_list = [args.env]
-
-    register()
+    print(f'saving jsons to {save_path}')
 
     for env_name in env_list:
-        env = gym.make(env_name)
-        env = env.MineRLObservationWrapper(env.MineRLActionWrapper(env))
-
-        batch_builder = SampleBatchBuilder()
-        writer = JsonWriter(os.path.join(save_path, env_name))
-        prep = get_preprocessor(env.observation_space)(env.observation_space)
-
-        env.close()
-
-        data = minerl.data.make(env_name, data_dir=args.data_path)
-
-        for trajectory_name in data.get_trajectory_names():
-            t = 0
-            prev_action = None
-            prev_reward = 0
-            done = False
-            obs = None
-            info = None
-            for obs, action, reward, next_obs, done in data.load_data(trajectory_name):
-                obs = (obs['pov'], obs['vector'])
-                next_obs = (next_obs['pov'], next_obs['vector'])
-                action = action['vector']
-                if prev_action is None:
-                    prev_action = np.zeros_like(action)
-
-                batch_builder.add_values(
-                    t=t,
-                    eps_id=trajectory_name,
-                    agent_index=0,
-                    obs=prep.transform(obs),
-                    actions=action,
-                    action_prob=1.0,  # put the true action probability here
-                    rewards=reward,
-                    prev_actions=prev_action,
-                    prev_rewards=prev_reward,
-                    dones=done,
-                    infos=info,
-                    new_obs=prep.transform(next_obs))
-                prev_action = action
-                prev_reward = reward
-                t += 1
-            writer.write(batch_builder.build_and_reset())
+        print(f'Writing data to json files for environment {env_name}')
+        env_save_path = os.path.join(save_path, env_name)
+        write_jsons(env_name, args.data_dir, env_config, env_save_path, overwrite=args.overwrite)
 
 
 if __name__ == '__main__':

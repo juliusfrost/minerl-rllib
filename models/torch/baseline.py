@@ -149,7 +149,7 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
             state_inputs = torch.cat((pov_embed, vector_embed), dim=-1)
 
         if self.use_rnn:
-            batch_t, batch_n, state_size = 1, 1, state_inputs.size(1)
+            batch_t, batch_n, state_size = 1, state_inputs.size(0), state_inputs.size(1)
             if isinstance(seq_lens, np.ndarray):
                 batch_t, batch_n = state_inputs.size(0) // len(seq_lens), len(seq_lens)
                 state_inputs = torch.reshape(state_inputs, (batch_t, batch_n, state_size))

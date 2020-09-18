@@ -56,13 +56,17 @@ class GRUBaseline(RecurrentBaseline):
         assert isinstance(x, torch.Tensor) or isinstance(x, nn.utils.rnn.PackedSequence)
         # state shape [tensor(batch, layers, feature)]
         assert isinstance(state, list)
-        assert len(state) == 1
-        h_0 = state[0]
-        assert isinstance(h_0, torch.Tensor)
-        assert len(h_0.size()) == 3
-        assert h_0.size(1) == self.num_layers
-        # permute to shape tensor(layers, batch, feature)
-        h_0 = h_0.to(self.device).permute(1, 0, 2)
+        if len(state) == 1:
+            h_0 = state[0]
+            assert isinstance(h_0, torch.Tensor)
+            assert len(h_0.size()) == 3
+            assert h_0.size(1) == self.num_layers
+            # permute to shape tensor(layers, batch, feature)
+            h_0 = h_0.to(self.device).permute(1, 0, 2)
+        elif len(state) == 0:
+            h_0 = None
+        else:
+            raise NotImplementedError
         output, h_n = self.rnn(x.to(self.device), h_0)
         # change back to shape [tensor(batch, layers, feature)]
         rnn_state = [h_n.permute(1, 0, 2)]
@@ -84,17 +88,21 @@ class LSTMBaseline(RecurrentBaseline):
         assert isinstance(x, torch.Tensor) or isinstance(x, nn.utils.rnn.PackedSequence)
         # state shape [tensor(batch, layers, feature)]
         assert isinstance(state, list)
-        assert len(state) == 2
-        h_0, c_0 = state
-        assert isinstance(h_0, torch.Tensor)
-        assert isinstance(c_0, torch.Tensor)
-        assert len(h_0.size()) == 3
-        assert len(c_0.size()) == 3
-        assert h_0.size(1) == self.num_layers
-        assert c_0.size(1) == self.num_layers
-        # permute to shape tensor(layers, batch, feature)
-        h_0 = h_0.to(self.device).permute(1, 0, 2)
-        c_0 = c_0.to(self.device).permute(1, 0, 2)
+        if len(state) == 2:
+            h_0, c_0 = state
+            assert isinstance(h_0, torch.Tensor)
+            assert isinstance(c_0, torch.Tensor)
+            assert len(h_0.size()) == 3
+            assert len(c_0.size()) == 3
+            assert h_0.size(1) == self.num_layers
+            assert c_0.size(1) == self.num_layers
+            # permute to shape tensor(layers, batch, feature)
+            h_0 = h_0.to(self.device).permute(1, 0, 2)
+            c_0 = c_0.to(self.device).permute(1, 0, 2)
+        elif len(state) == 0:
+            h_0, c_0 = None, None
+        else:
+            raise NotImplementedError
         output, (h_n, c_n) = self.rnn(x.to(self.device), (h_0, c_0))
         # change back to shape [tensor(batch, layers, feature)]
         rnn_state = [h_n.permute(1, 0, 2), c_n.permute(1, 0, 2)]
