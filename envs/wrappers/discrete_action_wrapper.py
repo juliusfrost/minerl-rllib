@@ -17,7 +17,7 @@ class MineRLDiscreteActionWrapper(gym.ActionWrapper):
         self.nearest_neighbors = NearestNeighbors(n_neighbors=1).fit(self.kmeans)
 
     def action(self, action: int):
-        return self.env.action(self.kmeans[action])
+        return self.kmeans[action]
 
     def reverse_action(self, action: np.ndarray):
         action = self.env.reverse_action(action)
