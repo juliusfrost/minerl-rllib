@@ -8,12 +8,10 @@ from envs.env import LazyMineRLEnv, MineRLRandomDebugEnv
 from envs.wrappers import wrap
 
 
-def register(discrete=False, num_actions=32, data_dir=None, **kwargs):
+def register():
     """
     Must be called to register the MineRL environments for RLlib
     """
-    wrap_kwargs = dict(discrete=discrete, num_actions=num_actions, data_dir=data_dir)
-    wrap_kwargs.update(kwargs)
 
     for env_spec in minerl.herobraine.envs.obfuscated_envs:
         env_kwargs = copy.deepcopy(dict(
@@ -25,13 +23,11 @@ def register(discrete=False, num_actions=32, data_dir=None, **kwargs):
         ))
 
         def env_creator(env_config):
-            wrap_kwargs.update(env_config)
-            return wrap(LazyMineRLEnv(**env_kwargs), **wrap_kwargs)
+            return wrap(LazyMineRLEnv(**env_kwargs), **env_config)
 
         register_env(env_spec.name, env_creator)
 
     def env_creator(env_config):
-        wrap_kwargs.update(env_config)
-        return wrap(MineRLRandomDebugEnv(), **wrap_kwargs)
+        return wrap(MineRLRandomDebugEnv(), **env_config)
 
     register_env('MineRLRandomDebug-v0', env_creator)
