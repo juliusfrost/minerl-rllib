@@ -1,7 +1,8 @@
 import copy
 import os
 
-import minerl
+from minerl.herobraine.env_spec import MISSIONS_DIR
+from minerl.herobraine.envs import ENVS
 from ray.tune.registry import register_env
 
 from envs.env import LazyMineRLEnv, MineRLRandomDebugEnv
@@ -13,12 +14,12 @@ def register():
     Must be called to register the MineRL environments for RLlib
     """
 
-    for env_spec in minerl.herobraine.envs.obfuscated_envs:
+    for env_spec in ENVS:
         env_kwargs = copy.deepcopy(dict(
             observation_space=env_spec.observation_space,
             action_space=env_spec.action_space,
             docstr=env_spec.get_docstring(),
-            xml=os.path.join(minerl.herobraine.env_spec.MISSIONS_DIR, env_spec.xml),
+            xml=os.path.join(MISSIONS_DIR, env_spec.xml),
             env_spec=env_spec,
         ))
 
