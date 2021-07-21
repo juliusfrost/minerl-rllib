@@ -1,23 +1,27 @@
 import filelock
 import gym
 import gym.wrappers
-import minerl
+from minerl.herobraine.env_spec import EnvSpec
+from minerl.herobraine.envs import BASIC_ENV_SPECS, COMPETITION_ENV_SPECS, BASALT_COMPETITION_ENV_SPECS
+from minerl.herobraine.envs import MINERL_OBTAIN_DIAMOND_OBF_V0 as DEBUG_ENV_SPEC
+from minerl_wrappers import wrap
+from ray.tune.registry import register_env
 
 
 class LazyMineRLEnv(gym.Env):
-    def __init__(self, *args, **kwargs):
-        self._args = args
+    def __init__(self, env_spec, **kwargs):
         self._kwargs = kwargs
+        self.env_spec: EnvSpec = env_spec
         self._env = None
-        self.observation_space = kwargs.get('observation_space')
-        self.action_space = kwargs.get('action_space')
-        self.env_spec = kwargs.get('env_spec')
         super().__init__()
+
+    def init_env(self):
+        with filelock.FileLock('minerl_env.lock'):
+            self._env = self.env_spec.make(**self._kwargs)
 
     def reset(self, **kwargs):
         if self._env is None:
-            with filelock.FileLock('minerl_env.lock'):
-                self._env = minerl.env.MineRLEnv(*self._args, **self._kwargs)
+            self.init_env()
         return self._env.reset()
 
     def step(self, action):
@@ -29,6 +33,8 @@ class LazyMineRLEnv(gym.Env):
     def __getattr__(self, name):
         if name.startswith('_'):
             raise AttributeError("attempted to get missing private attribute '{}'".format(name))
+        if self._env is None:
+            self.init_env()
         return getattr(self._env, name)
 
 
@@ -42,7 +48,7 @@ class MineRLRandomDebugEnv(gym.Env):
         self.action_space = gym.spaces.Dict(dict(vector=action_space))
         self.done = False
         self.t = 0
-        self.env_spec = minerl.herobraine.envs.MINERL_OBTAIN_DIAMOND_OBF_V0
+        self.env_spec = DEBUG_ENV_SPEC
 
     def _obs(self):
         return self.observation_space.sample()
@@ -65,3 +71,16 @@ class MineRLRandomDebugEnv(gym.Env):
 
     def render(self, mode='human'):
         pass
+
+
+def register_minerl_envs():
+    for env_spec in (BASIC_ENV_SPECS + COMPETITION_ENV_SPECS + BASALT_COMPETITION_ENV_SPECS):
+        def env_creator(env_config):
+            return wrap(LazyMineRLEnv(env_spec), **env_config)
+
+        register_env(env_spec.name, env_creator)
+
+    def env_creator(env_config):
+        return wrap(MineRLRandomDebugEnv(), **env_config)
+
+    register_env('MineRLRandomDebug-v0', env_creator)
