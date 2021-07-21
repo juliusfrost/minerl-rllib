@@ -2,7 +2,11 @@ import filelock
 import gym
 import gym.wrappers
 from minerl.herobraine.env_spec import EnvSpec
-from minerl.herobraine.envs import BASIC_ENV_SPECS, COMPETITION_ENV_SPECS, BASALT_COMPETITION_ENV_SPECS
+from minerl.herobraine.envs import (
+    BASIC_ENV_SPECS,
+    COMPETITION_ENV_SPECS,
+    BASALT_COMPETITION_ENV_SPECS,
+)
 from minerl.herobraine.envs import MINERL_OBTAIN_DIAMOND_OBF_V0 as DEBUG_ENV_SPEC
 from minerl_wrappers import wrap
 from ray.tune.registry import register_env
@@ -16,7 +20,7 @@ class LazyMineRLEnv(gym.Env):
         super().__init__()
 
     def init_env(self):
-        with filelock.FileLock('minerl_env.lock'):
+        with filelock.FileLock("minerl_env.lock"):
             self._env = self.env_spec.make(**self._kwargs)
 
     def reset(self, **kwargs):
@@ -27,12 +31,14 @@ class LazyMineRLEnv(gym.Env):
     def step(self, action):
         return self._env.step(action)
 
-    def render(self, mode='human'):
+    def render(self, mode="human"):
         return self._env.render(mode)
 
     def __getattr__(self, name):
-        if name.startswith('_'):
-            raise AttributeError("attempted to get missing private attribute '{}'".format(name))
+        if name.startswith("_"):
+            raise AttributeError(
+                "attempted to get missing private attribute '{}'".format(name)
+            )
         if self._env is None:
             self.init_env()
         return getattr(self._env, name)
@@ -42,9 +48,15 @@ class MineRLRandomDebugEnv(gym.Env):
     def __init__(self):
         super(MineRLRandomDebugEnv, self).__init__()
         pov_space = gym.spaces.Box(low=0, high=255, shape=(64, 64, 3))
-        vector_space = gym.spaces.Box(low=-1.2000000476837158, high=1.2000000476837158, shape=(64,))
-        self.observation_space = gym.spaces.Dict(dict(pov=pov_space, vector=vector_space))
-        action_space = gym.spaces.Box(low=-1.0499999523162842, high=1.0499999523162842, shape=(64,))
+        vector_space = gym.spaces.Box(
+            low=-1.2000000476837158, high=1.2000000476837158, shape=(64,)
+        )
+        self.observation_space = gym.spaces.Dict(
+            dict(pov=pov_space, vector=vector_space)
+        )
+        action_space = gym.spaces.Box(
+            low=-1.0499999523162842, high=1.0499999523162842, shape=(64,)
+        )
         self.action_space = gym.spaces.Dict(dict(vector=action_space))
         self.done = False
         self.t = 0
@@ -55,7 +67,7 @@ class MineRLRandomDebugEnv(gym.Env):
 
     def step(self, action):
         obs = self._obs()
-        reward = 0.
+        reward = 0.0
         if self.t < 100:
             self.done = False
         else:
@@ -69,12 +81,15 @@ class MineRLRandomDebugEnv(gym.Env):
         self.t = 0
         return self._obs()
 
-    def render(self, mode='human'):
+    def render(self, mode="human"):
         pass
 
 
 def register_minerl_envs():
-    for env_spec in (BASIC_ENV_SPECS + COMPETITION_ENV_SPECS + BASALT_COMPETITION_ENV_SPECS):
+    for env_spec in (
+        BASIC_ENV_SPECS + COMPETITION_ENV_SPECS + BASALT_COMPETITION_ENV_SPECS
+    ):
+
         def env_creator(env_config):
             return wrap(LazyMineRLEnv(env_spec), **env_config)
 
@@ -83,4 +98,4 @@ def register_minerl_envs():
     def env_creator(env_config):
         return wrap(MineRLRandomDebugEnv(), **env_config)
 
-    register_env('MineRLRandomDebug-v0', env_creator)
+    register_env("MineRLRandomDebug-v0", env_creator)
