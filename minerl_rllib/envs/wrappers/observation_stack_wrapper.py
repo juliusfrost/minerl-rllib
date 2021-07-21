@@ -28,16 +28,24 @@ class MineRLObservationStack(gym.Wrapper):
                 self.tuple_len += 1
             self.observation_space = gym.spaces.Tuple(new_spaces)
         elif isinstance(self.observation_space, gym.spaces.Box):
-            low = np.repeat(self.observation_space.low[np.newaxis, ...], num_stack, axis=0)
-            high = np.repeat(self.observation_space.high[np.newaxis, ...], num_stack, axis=0)
-            self.observation_space = gym.spaces.Box(low=low, high=high, dtype=self.observation_space.dtype)
+            low = np.repeat(
+                self.observation_space.low[np.newaxis, ...], num_stack, axis=0
+            )
+            high = np.repeat(
+                self.observation_space.high[np.newaxis, ...], num_stack, axis=0
+            )
+            self.observation_space = gym.spaces.Box(
+                low=low, high=high, dtype=self.observation_space.dtype
+            )
         else:
             raise NotImplementedError
 
     def _get_observation(self):
         assert len(self.frames) == self.num_stack, (len(self.frames), self.num_stack)
         if not self.tuple:
-            return gym.wrappers.frame_stack.LazyFrames(list(self.frames), self.lz4_compress)
+            return gym.wrappers.frame_stack.LazyFrames(
+                list(self.frames), self.lz4_compress
+            )
         obs = []
         for i in range(self.tuple_len):
             frames = [f[i] for f in self.frames]

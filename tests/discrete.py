@@ -6,8 +6,8 @@ from minerl_rllib.envs import wrap
 
 
 def test_discrete():
-    os.chdir('..')
-    env = gym.make('MineRLTreechopVectorObf-v0')
+    os.chdir("..")
+    env = gym.make("MineRLTreechopVectorObf-v0")
     env = wrap(env, discrete=True, num_actions=32)
 
     for _ in tqdm(range(100)):
@@ -22,5 +22,5 @@ def test_discrete():
         obs, reward, done, info = env.step(action)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_discrete()

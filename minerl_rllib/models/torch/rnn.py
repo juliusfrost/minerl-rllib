@@ -14,7 +14,9 @@ class RecurrentBaseline(nn.Module):
         self.num_layers = num_layers
         self.name = name
 
-    def forward(self, x: Union[Tensor, PackedSequence], state: List[Tensor]) -> Tuple[Union[Tensor, PackedSequence]]:
+    def forward(
+        self, x: Union[Tensor, PackedSequence], state: List[Tensor]
+    ) -> Tuple[Union[Tensor, PackedSequence]]:
         """
         Forward pass through the recurrent network
         :param x: input tensor for the RNN with shape (seq, batch, feature) which can be a packed sequence
@@ -44,7 +46,7 @@ class RecurrentBaseline(nn.Module):
 
 class GRUBaseline(RecurrentBaseline):
     def __init__(self, input_size, hidden_size, num_layers=1, **kwargs):
-        super().__init__(input_size, hidden_size, num_layers, 'gru')
+        super().__init__(input_size, hidden_size, num_layers, "gru")
         self.rnn = nn.GRU(input_size, hidden_size, num_layers, **kwargs)
 
     def initial_state(self):
@@ -75,7 +77,7 @@ class GRUBaseline(RecurrentBaseline):
 
 class LSTMBaseline(RecurrentBaseline):
     def __init__(self, input_size, hidden_size, num_layers=1, **kwargs):
-        super().__init__(input_size, hidden_size, num_layers, 'lstm')
+        super().__init__(input_size, hidden_size, num_layers, "lstm")
         self.rnn = nn.LSTM(input_size, hidden_size, num_layers, **kwargs)
 
     def initial_state(self):
