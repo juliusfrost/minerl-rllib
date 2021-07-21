@@ -6,8 +6,7 @@ $ python rllib_train.py --help
 
 from ray.rllib.train import create_parser, run
 
-import envs
-import models
+from minerl_rllib import models, envs
 
 envs.register()
 models.register()

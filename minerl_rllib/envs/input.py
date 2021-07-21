@@ -10,7 +10,7 @@ from ray.rllib.policy.sample_batch import SampleBatch
 from ray.rllib.utils.typing import SampleBatchType
 from ray.tune.registry import register_input
 
-from envs.data import MinerRLDataEnv, wrap_env
+from minerl_rllib.envs.data import MinerRLDataEnv, wrap_env
 
 
 class MineRLInputReader(InputReader):

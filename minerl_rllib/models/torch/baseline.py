@@ -1,13 +1,12 @@
+import gym
 import numpy as np
 import torch
 import torch.nn as nn
-import gym
-
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
 from ray.tune.utils import merge_dicts
 
-import models
+from minerl_rllib import models
 
 BASELINE_CONFIG = {
     # specifies the size of the state embedding
@@ -19,7 +18,7 @@ BASELINE_CONFIG = {
     # implemented: [gru, lstm]
     'rnn_type': 'gru',
     # specifies whether to include the previous action and reward as part of the observation
-    'use_prev_action_reward': True,
+    'use_prev_action_reward': False,
     # specifies extra key word arguments for the RNN class
     'rnn_config': {
         # specifies the rnn hidden layer size
@@ -104,9 +103,9 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
         if self.use_rnn:
             state_embed_size = rnn_config['hidden_size']
             if rnn_type == 'lstm':
-                self._rnn = models.torch.rnn.LSTMBaseline(state_input_size, **rnn_config)
+                self._rnn = minerl_rllib.models.torch.rnn.LSTMBaseline(state_input_size, **rnn_config)
             elif rnn_type == 'gru':
-                self._rnn = models.torch.rnn.GRUBaseline(state_input_size, **rnn_config)
+                self._rnn = minerl_rllib.models.torch.rnn.GRUBaseline(state_input_size, **rnn_config)
             else:
                 raise NotImplementedError
         else:
@@ -127,8 +126,33 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
         return []
 
     def forward(self, input_dict, state, seq_lens):
+        recursive_print(dict(input_dict=input_dict, state=state, seq_lens=seq_lens))
+        includes_time_dim = False if seq_lens is None else len(seq_lens) > 0
+
+        flat_shape = input_dict['obs_flat'].shape
+        if len(flat_shape) == 3:
+            batch_t = flat_shape[0]
+            batch_n = flat_shape[1]
+            raise ValueError(f"obs_flat shape = {flat_shape}")
+        elif len(flat_shape) == 2:
+            if includes_time_dim:
+                batch_n = len(seq_lens)
+                batch_t = flat_shape[0] // batch_n
+            else:
+                batch_t = 1
+                batch_n = flat_shape[0]
+        else:
+            batch_t = 1
+            batch_n = 1
+
         device = next(self.parameters()).device
         pov = input_dict['obs'][0].permute(0, 3, 1, 2)  # n,c,h,w
+        # if len(input_dict['obs'][0].shape) == 4:
+        #     pov = input_dict['obs'][0].permute(0, 3, 1, 2)  # n,c,h,w
+        # elif len(input_dict['obs'][0].shape) == 5:
+        #     pov = input_dict['obs'][0].permute(0, 1, 4, 2, 3)  # t,n,c,h,w
+        # else:
+        #     raise ValueError('expected different shape for pov input')
         vector = input_dict['obs'][1]
         pov_embed = self._pov_network(pov.to(device))
         pov_embed = torch.reshape(pov_embed, pov_embed.shape[:2])
@@ -139,7 +163,6 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
             if self.discrete:
                 prev_actions = prev_actions.long()
             prev_rewards = input_dict['prev_rewards']
-            prev_rewards = torch.reshape(prev_rewards, (-1, 1))
 
             action_embed = self._action_network(prev_actions.to(device))
             reward_embed = self._reward_network(prev_rewards.to(device))
@@ -149,16 +172,17 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
             state_inputs = torch.cat((pov_embed, vector_embed), dim=-1)
 
         if self.use_rnn:
-            batch_t, batch_n, state_size = 1, state_inputs.size(0), state_inputs.size(1)
-            if isinstance(seq_lens, np.ndarray):
-                batch_t, batch_n = state_inputs.size(0) // len(seq_lens), len(seq_lens)
-                state_inputs = torch.reshape(state_inputs, (batch_t, batch_n, state_size))
-                state_inputs = torch.nn.utils.rnn.pack_padded_sequence(state_inputs, seq_lens, enforce_sorted=False)
-            else:
-                state_inputs = torch.reshape(state_inputs, (batch_t, batch_n, state_size))
+            state_size = state_inputs.shape[-1]
+            state_inputs = torch.reshape(state_inputs, (batch_t, batch_n, state_size))
+            # if includes_time_dim:
+            #     state_inputs = torch.reshape(state_inputs, (batch_t, batch_n, state_size))
+            #     print(state_inputs, state_inputs.shape, seq_lens)
+            #     state_inputs = torch.nn.utils.rnn.pack_padded_sequence(state_inputs, seq_lens, enforce_sorted=False)
+            # else:
+            #     state_inputs = torch.reshape(state_inputs, (batch_t, batch_n, state_size))
             rnn_output, rnn_state = self._rnn(state_inputs, state)
-            if isinstance(seq_lens, np.ndarray):
-                rnn_output, _ = torch.nn.utils.rnn.pad_packed_sequence(rnn_output)
+            # if includes_time_dim:
+            #     rnn_output, _ = torch.nn.utils.rnn.pad_packed_sequence(rnn_output)
             self._logits = torch.reshape(rnn_output, (batch_t * batch_n, self._rnn.hidden_size))
         else:
             self._logits = self._state_network(state_inputs)
@@ -168,7 +192,7 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
         return outputs, rnn_state
 
     def value_function(self):
-        values = self._value_head(self._logits).squeeze()
+        values = self._value_head(self._logits)
         return values
 
     def import_from_h5(self, h5_file):
@@ -182,3 +206,21 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
 
 def register():
     ModelCatalog.register_custom_model('minerl_torch_model', MineRLTorchModel)
+
+
+def recursive_print(d):
+    if isinstance(d, dict):
+        print('{')
+        for k, v in d.items():
+            print(f'key={k}')
+            recursive_print(v)
+        print('}')
+    elif isinstance(d, list) or isinstance(d, tuple):
+        print('[')
+        for v in d:
+            recursive_print(v)
+        print(']')
+    elif isinstance(d, np.ndarray) or isinstance(d, torch.Tensor):
+        print(d.shape)
+    else:
+        print(d)

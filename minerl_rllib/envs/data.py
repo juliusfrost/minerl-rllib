@@ -9,7 +9,7 @@ from ray.rllib.models.preprocessors import get_preprocessor
 from ray.rllib.offline import InputReader
 from ray.rllib.offline.json_writer import JsonWriter
 
-from envs.wrappers import wrap
+from minerl_rllib.envs.wrappers import wrap
 
 
 class MinerRLDataEnv(gym.Env):

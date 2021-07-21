@@ -6,7 +6,7 @@ import yaml
 from minerl.herobraine.envs import obfuscated_envs
 from ray.tune.utils import merge_dicts
 
-from envs.data import write_jsons
+from minerl_rllib.envs.data import write_jsons
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data-dir', type=str, default=os.getenv('MINERL_DATA_ROOT', 'data'),

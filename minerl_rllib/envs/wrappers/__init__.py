@@ -1,13 +1,13 @@
-from envs.wrappers.action_repeat_wrapper import MineRLActionRepeat
-from envs.wrappers.action_wrapper import MineRLActionWrapper
-from envs.wrappers.deterministic_wrapper import MineRLDeterministic
-from envs.wrappers.discrete_action_wrapper import MineRLDiscreteActionWrapper
-from envs.wrappers.gray_scale_wrapper import MineRLGrayScale
-from envs.wrappers.normalize import MineRLNormalizeObservationWrapper, MineRLNormalizeActionWrapper, \
+from minerl_rllib.envs.wrappers.action_repeat_wrapper import MineRLActionRepeat
+from minerl_rllib.envs.wrappers.action_wrapper import MineRLActionWrapper
+from minerl_rllib.envs.wrappers.deterministic_wrapper import MineRLDeterministic
+from minerl_rllib.envs.wrappers.discrete_action_wrapper import MineRLDiscreteActionWrapper
+from minerl_rllib.envs.wrappers.gray_scale_wrapper import MineRLGrayScale
+from minerl_rllib.envs.wrappers.normalize import MineRLNormalizeObservationWrapper, MineRLNormalizeActionWrapper, \
     MineRLRewardScaleWrapper
-from envs.wrappers.observation_stack_wrapper import MineRLObservationStack
-from envs.wrappers.observation_wrapper import MineRLObservationWrapper
-from envs.wrappers.time_limit_wrapper import MineRLTimeLimitWrapper
+from minerl_rllib.envs.wrappers.observation_stack_wrapper import MineRLObservationStack
+from minerl_rllib.envs.wrappers.observation_wrapper import MineRLObservationWrapper
+from minerl_rllib.envs.wrappers.time_limit_wrapper import MineRLTimeLimitWrapper
 
 
 def wrap(env, discrete=False, num_actions=32, data_dir=None, num_stack=1, action_repeat=1,
