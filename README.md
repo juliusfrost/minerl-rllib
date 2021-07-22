@@ -7,15 +7,16 @@ RLlib natively supports TensorFlow, TensorFlow Eager, and PyTorch, but most of i
 
 ## Installation
 
+Requires Python 3.7 or 3.8.
+
 1. Make sure you have JDK 1.8 on your system for [MineRL](https://minerl.io/docs/tutorials/index.html#installation).
-2. Install [PyTorch](https://pytorch.org/get-started/locally/) and [TensorFlow](https://www.tensorflow.org/install) with correct cuda version
-3. Install [Ray Latest Snapshots (Nightlies)](https://docs.ray.io/en/master/installation.html#latest-snapshots-nightlies) 
-4. Finally, 
 ```
 git clone https://github.com/juliusfrost/minerl-rllib.git
 cd minerl-rllib
 pip install -r requirements.txt
 ```
+2. Install [Ray Latest Snapshots (Nightlies)](https://docs.ray.io/en/master/installation.html#latest-snapshots-nightlies)
+3. Install [PyTorch](https://pytorch.org/get-started/locally/) and [TensorFlow](https://www.tensorflow.org/install) with correct cuda version.
 
 ## Implementation Details
 See [Implementation Details](Implementation.md)
