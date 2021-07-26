@@ -91,7 +91,9 @@ def register_minerl_envs():
     ):
 
         def env_creator(env_config):
-            return wrap(LazyMineRLEnv(env_spec), **env_config)
+            with filelock.FileLock("minerl_env.lock"):
+                env = wrap(env_spec.make(), **env_config)
+            return env
 
         register_env(env_spec.name, env_creator)
 
