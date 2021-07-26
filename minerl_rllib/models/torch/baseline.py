@@ -1,3 +1,5 @@
+import importlib
+
 import gym
 import numpy as np
 import torch
@@ -6,7 +8,7 @@ from ray.rllib.models import ModelCatalog
 from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
 from ray.tune.utils import merge_dicts
 
-from minerl_rllib import models
+from minerl_rllib.models.torch.rnn import GRUBaseline, LSTMBaseline
 
 BASELINE_CONFIG = {
     # specifies the size of the state embedding
@@ -83,9 +85,8 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
             self.discrete = False
 
         def get_factory(network_name):
-            return getattr(
-                getattr(models.torch, network_name), model_config[f"{network_name}_net"]
-            )
+            base_module = importlib.import_module(f"minerl_rllib.models.torch.{network_name}")
+            return getattr(base_module, model_config[f"{network_name}_net"])
 
         self._pov_network, pov_embed_size = get_factory("pov")(
             **model_config["pov_net_kwargs"]
@@ -107,11 +108,11 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
         if self.use_rnn:
             state_embed_size = rnn_config["hidden_size"]
             if rnn_type == "lstm":
-                self._rnn = minerl_rllib.models.torch.rnn.LSTMBaseline(
+                self._rnn = LSTMBaseline(
                     state_input_size, **rnn_config
                 )
             elif rnn_type == "gru":
-                self._rnn = minerl_rllib.models.torch.rnn.GRUBaseline(
+                self._rnn = GRUBaseline(
                     state_input_size, **rnn_config
                 )
             else:
