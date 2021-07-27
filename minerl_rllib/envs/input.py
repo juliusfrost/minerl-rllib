@@ -37,14 +37,12 @@ class MineRLInputReader(InputReader):
         num_epochs = input_config.get("num_epochs", -1)
         preload_buffer_size = input_config.get("preload_buffer_size", 2)
         seed = input_config.get("seed", None)
-        include_metadata = input_config.get("include_metadata", False)
         self.generator = self.data.batch_iter(
             batch_size,
             seq_len,
             num_epochs=num_epochs,
             preload_buffer_size=preload_buffer_size,
             seed=seed,
-            include_metadata=include_metadata,
         )
         env = MinerRLDataEnv(self.data)
         env = wrap_env(env, env_config)
