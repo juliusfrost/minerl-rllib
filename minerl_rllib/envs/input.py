@@ -2,15 +2,62 @@ import os
 
 import gym
 import numpy as np
+from ray.rllib.evaluation import SampleBatchBuilder
 from ray.rllib.models.preprocessors import get_preprocessor
-
 from ray.rllib.offline import IOContext
 from ray.rllib.offline.input_reader import InputReader
 from ray.rllib.policy.sample_batch import SampleBatch
 from ray.rllib.utils.typing import SampleBatchType
 from ray.tune.registry import register_input
 
-from minerl_rllib.envs.data import MinerRLDataEnv, wrap_env
+from minerl_rllib.envs.data import MinerRLDataEnv
+from minerl_rllib.envs.env import wrap_env
+from minerl_rllib.envs.utils import patch_data_pipeline
+
+
+def simulate_env_interaction(env, restart=True) -> SampleBatch:
+    prep = get_preprocessor(env.observation_space)(env.observation_space)
+    batch_builder = SampleBatchBuilder()
+    while restart:
+        for eps_id, trajectory_name in enumerate(env.trajectory_names):
+            t = 0
+            prev_action = None
+            prev_reward = 0
+            done = False
+            try:
+                obs = env.reset()
+            except TypeError:
+                continue
+            while not done:
+                new_obs, reward, done, info = env.step(env.action_space.sample())
+                action = info["action"]
+                action = env.reverse_action(action)
+                if prev_action is None:
+                    prev_action = np.zeros_like(action)
+
+                batch = {
+                    "t": t,
+                    SampleBatch.EPS_ID: eps_id,
+                    SampleBatch.AGENT_INDEX: eps_id,
+                    SampleBatch.OBS: prep.transform(obs),
+                    SampleBatch.ACTIONS: action,
+                    SampleBatch.ACTION_PROB: 1.0,
+                    SampleBatch.ACTION_LOGP: 0,
+                    SampleBatch.ACTION_DIST_INPUTS: 0,
+                    SampleBatch.REWARDS: reward,
+                    SampleBatch.PREV_ACTIONS: prev_action,
+                    SampleBatch.PREV_REWARDS: prev_reward,
+                    SampleBatch.DONES: done,
+                    SampleBatch.INFOS: {"trajectory_name": trajectory_name},
+                    SampleBatch.NEXT_OBS: prep.transform(new_obs),
+                }
+
+                batch_builder.add_values(**batch)
+                obs = new_obs
+                prev_action = action
+                prev_reward = reward
+                t += 1
+            yield batch_builder.build_and_reset()
 
 
 class MineRLInputReader(InputReader):
@@ -18,6 +65,8 @@ class MineRLInputReader(InputReader):
         super().__init__()
         print("Input reader initialization success!")
         import minerl
+
+        patch_data_pipeline()
 
         input_config = ioctx.input_config
         env_name = ioctx.config.get("env")
@@ -37,6 +86,7 @@ class MineRLInputReader(InputReader):
         num_epochs = input_config.get("num_epochs", -1)
         preload_buffer_size = input_config.get("preload_buffer_size", 2)
         seed = input_config.get("seed", None)
+        self.load_complete_episodes = input_config.get("load_complete_episodes", True)
         self.generator = self.data.batch_iter(
             batch_size,
             seq_len,
@@ -45,8 +95,8 @@ class MineRLInputReader(InputReader):
             seed=seed,
         )
         env = MinerRLDataEnv(self.data)
-        env = wrap_env(env, env_config)
-        print(env.observation_space)
+        env = wrap_env(env, **env_config)
+        self.episode_generator = simulate_env_interaction(env)
         self.prep = get_preprocessor(env.observation_space)(env.observation_space)
 
         env_ptr = env
@@ -89,7 +139,17 @@ class MineRLInputReader(InputReader):
         return reward
 
     def next(self) -> SampleBatchType:
-        obs, action, reward, next_obs, done = self.process_batch(next(self.generator))
+        if self.load_complete_episodes:
+            return self.next_episode_batch()
+        else:
+            return self.next_trajectory_batch()
+
+    def next_episode_batch(self) -> SampleBatch:
+        return next(self.episode_generator)
+
+    def next_trajectory_batch(self) -> SampleBatch:
+        data = self.process_batch(next(self.generator))
+        obs, action, reward, next_obs, done = data[:5]
         d = {
             SampleBatch.OBS: obs,
             SampleBatch.ACTIONS: action,
@@ -97,7 +157,6 @@ class MineRLInputReader(InputReader):
             SampleBatch.REWARDS: reward,
             SampleBatch.DONES: done,
         }
-        # recursive_print(d)
         return SampleBatch(d)
 
     def process_batch(self, batch):
