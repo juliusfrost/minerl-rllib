@@ -85,7 +85,9 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
             self.discrete = False
 
         def get_factory(network_name):
-            base_module = importlib.import_module(f"minerl_rllib.models.torch.{network_name}")
+            base_module = importlib.import_module(
+                f"minerl_rllib.models.torch.{network_name}"
+            )
             return getattr(base_module, model_config[f"{network_name}_net"])
 
         self._pov_network, pov_embed_size = get_factory("pov")(
@@ -108,13 +110,9 @@ class MineRLTorchModel(TorchModelV2, nn.Module):
         if self.use_rnn:
             state_embed_size = rnn_config["hidden_size"]
             if rnn_type == "lstm":
-                self._rnn = LSTMBaseline(
-                    state_input_size, **rnn_config
-                )
+                self._rnn = LSTMBaseline(state_input_size, **rnn_config)
             elif rnn_type == "gru":
-                self._rnn = GRUBaseline(
-                    state_input_size, **rnn_config
-                )
+                self._rnn = GRUBaseline(state_input_size, **rnn_config)
             else:
                 raise NotImplementedError
         else:
