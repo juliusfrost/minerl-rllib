@@ -710,7 +710,7 @@ python-versions = "*"
 
 [[package]]
 name = "networkx"
-version = "2.6.2"
+version = "2.6.3"
 description = "Python package for creating and manipulating graphs and networks"
 category = "main"
 optional = false
@@ -933,7 +933,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "py-spy"
-version = "0.3.8"
+version = "0.3.9"
 description = "Sampling profiler for Python programs"
 category = "main"
 optional = false
@@ -1993,8 +1993,8 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
 networkx = [
-    {file = "networkx-2.6.2-py3-none-any.whl", hash = "sha256:5fcb7004be69e8fbdf07dcb502efa5c77cadcaad6982164134eeb9721f826c2e"},
-    {file = "networkx-2.6.2.tar.gz", hash = "sha256:2306f1950ce772c5a59a57f5486d59bb9cab98497c45fc49cbc45ac0dec119bb"},
+    {file = "networkx-2.6.3-py3-none-any.whl", hash = "sha256:80b6b89c77d1dfb64a4c7854981b60aeea6360ac02c6d4e4913319e0a313abef"},
+    {file = "networkx-2.6.3.tar.gz", hash = "sha256:c0946ed31d71f1b732b5aaa6da5a0388a345019af232ce2f49c766e2d6795c51"},
 ]
 numpy = [
     {file = "numpy-1.21.1-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:38e8648f9449a549a7dfe8d8755a5979b45b3538520d1e735637ef28e8c2dc50"},
@@ -2243,14 +2243,14 @@ py = [
     {file = "py-1.10.0.tar.gz", hash = "sha256:21b81bda15b66ef5e1a777a21c4dcd9c20ad3efd0b3f817e7a809035269e1bd3"},
 ]
 py-spy = [
-    {file = "py_spy-0.3.8-py2.py3-none-macosx_10_7_x86_64.whl", hash = "sha256:f13a61fc643fb99bfb3e133d6d92534121ce21a9e5a237da919bd635ad438e5e"},
-    {file = "py_spy-0.3.8-py2.py3-none-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:ee84219d9187f8e6693ff02f3cea975f7edf75440fef3fa060bac4338615e1ed"},
-    {file = "py_spy-0.3.8-py2.py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:6b085fb41994006c4e29be6605bda5275e23c7cf78993f1fe64203d6811dad77"},
-    {file = "py_spy-0.3.8-py2.py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:0503a0189b2030f7bb794e72f4b08b30d99efb5fc42d3d6ed901a21118280c60"},
-    {file = "py_spy-0.3.8-py2.py3-none-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:5ef21e03dfc8d6ae55d3da450daeb8495f96e47ca150a535a7c98de85bfbe290"},
-    {file = "py_spy-0.3.8-py2.py3-none-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:281afa786bd3a70a8375029f47f34b23aec02d9b06ed9b7cab8741c4e8cb8e32"},
-    {file = "py_spy-0.3.8-py2.py3-none-win_amd64.whl", hash = "sha256:3f55b6ef89b069166b6bd8927cccf0f960d6233875110f1de92159498c7a38c5"},
-    {file = "py_spy-0.3.8.tar.gz", hash = "sha256:eeb8961605e9071a8d501e43f9cd4896bc50efd58a891aa435735fb8d2ba21dd"},
+    {file = "py_spy-0.3.9-py2.py3-none-macosx_10_7_x86_64.whl", hash = "sha256:3c80c50a5b6b25a761c3688f9205330d20e4862152ef65a821349d5993ffe4a0"},
+    {file = "py_spy-0.3.9-py2.py3-none-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:c39178711e83e921aa15c61ebd37fbcd205cce8250c6844bfa3ce493ec09ff49"},
+    {file = "py_spy-0.3.9-py2.py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a43be414930cae73672d89d2c57c45fffa0d68a2c259047c50eab174f635528f"},
+    {file = "py_spy-0.3.9-py2.py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:1f76f97029f8839306d8a38e10319b8695d1ed4fa693396341b3ba9a9b4c8ff6"},
+    {file = "py_spy-0.3.9-py2.py3-none-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:3df9b490c40882ce9291037997496c281b3f0c6f50c5f0b9b0a159ba0f5ad43c"},
+    {file = "py_spy-0.3.9-py2.py3-none-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:8105e691eca41849e7940db49b340697a117f4b7a091fc248cf7d13be2bbc7d2"},
+    {file = "py_spy-0.3.9-py2.py3-none-win_amd64.whl", hash = "sha256:31e556317501dbf70ef14cb180f652905e7776228b79ba2c642f5deb5e826cf5"},
+    {file = "py_spy-0.3.9.tar.gz", hash = "sha256:127148a0de9264c9e036509c1596ca7402438bf7906c16a082e335af7a0d4261"},
 ]
 pyasn1 = [
     {file = "pyasn1-0.4.8-py2.4.egg", hash = "sha256:fec3e9d8e36808a28efb59b489e4528c10ad0f480e57dcc32b4de5c9d8c9fdf3"},
