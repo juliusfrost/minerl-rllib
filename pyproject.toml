@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "minerl-rllib"
+version = "0.1.0"
+description = "minerl-rllib is a reinforcement learning suite that benchmarks algorithms in RLLib on the MineRL environment."
+license = "GPL-3.0-only"
+authors = ["Julius Frost"]
+readme = "README.md"
+homepage = "https://github.com/juliusfrost/minerl-rllib/"
+repository = "https://github.com/juliusfrost/minerl-rllib/"
+
+[tool.poetry.dependencies]
+python = "^3.7.1"
+scikit-learn = "^0.24.2"
+ray = [
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.9' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp39-cp39-manylinux2014_x86_64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.8' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp38-cp38-manylinux2014_x86_64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.7' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.9' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp39-cp39-win_amd64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.8' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp38-cp38-win_amd64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.7' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp37-cp37m-win_amd64.whl"}
+]
+minerl-wrappers = "^0.1.4"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+black = "^21.7b0"
+
+[build-system]
+requires = ["poetry-core=1.1.8"]
+build-backend = "poetry.core.masonry.api"
