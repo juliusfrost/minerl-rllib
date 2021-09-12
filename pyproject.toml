@@ -12,14 +12,14 @@ repository = "https://github.com/juliusfrost/minerl-rllib/"
 python = "^3.7.1"
 scikit-learn = "^0.24.2"
 ray = [
-    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.9' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp39-cp39-manylinux2014_x86_64.whl"},
-    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.8' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp38-cp38-manylinux2014_x86_64.whl"},
-    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.7' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"},
-    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.9' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp39-cp39-win_amd64.whl"},
-    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.8' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp38-cp38-win_amd64.whl"},
-    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.7' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp37-cp37m-win_amd64.whl"}
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.9' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp39-cp39-manylinux2014_x86_64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.8' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp38-cp38-manylinux2014_x86_64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.7' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.9' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp39-cp39-win_amd64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.8' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp38-cp38-win_amd64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.7' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp37-cp37m-win_amd64.whl"}
 ]
-minerl-wrappers = "^0.1.4"
+minerl-wrappers = "^0.1.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
@@ -28,3 +28,9 @@ black = "^21.7b0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "DEBUG"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"

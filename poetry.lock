@@ -245,7 +245,7 @@ test = ["psutil"]
 
 [[package]]
 name = "decorator"
-version = "5.0.9"
+version = "5.1.0"
 description = "Decorators for Humans"
 category = "main"
 optional = false
@@ -635,7 +635,7 @@ traitlets = "*"
 
 [[package]]
 name = "minerl"
-version = "0.4.1a2"
+version = "0.4.2"
 description = "MineRL environment and data loader for reinforcement learning from human demonstration in Minecraft"
 category = "main"
 optional = false
@@ -671,7 +671,7 @@ docs = ["sphinx-rtd-theme", "sphinxcontrib-napoleon"]
 
 [[package]]
 name = "minerl-wrappers"
-version = "0.1.4"
+version = "0.1.5"
 description = "minerl-wrappers compiles common wrappers and standardizes code for reproducibility in the MineRL environment!"
 category = "main"
 optional = false
@@ -679,7 +679,7 @@ python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
 gym = ">=0.19.0,<0.20.0"
-minerl = "0.4.1a2"
+minerl = "0.4.2"
 numpy = ">=1.21.0,<2.0.0"
 opencv-python = ">=4.5.3,<5.0.0"
 PyYAML = ">=5.4.1,<6.0.0"
@@ -1103,8 +1103,7 @@ tabulate = {version = "*", optional = true, markers = "extra == \"rllib\""}
 tensorboardX = {version = ">=1.9", optional = true, markers = "extra == \"rllib\""}
 
 [package.extras]
-all = ["opentelemetry-exporter-otlp (==1.1.0)", "kubernetes", "lz4", "scikit-image", "aioredis (<2)", "prometheus-client (>=0.7.1)", "aiohttp-cors", "opentelemetry-api (==1.1.0)", "uvicorn", "tabulate", "pandas", "py-spy (>=0.2.0)", "starlette", "fastapi", "opencensus", "dm-tree", "scipy", "urllib3", "tensorboardX (>=1.9)", "colorful", "ray-cpp (==2.0.0.dev0)", "kopf", "aiohttp", "pyyaml", "jsonschema", "matplotlib (!=3.4.3)", "gym", "requests", "gpustat", "opentelemetry-sdk (==1.1.0)"]
-cpp = ["ray-cpp (==2.0.0.dev0)"]
+all = ["aioredis (<2)", "starlette", "opencensus", "scikit-image", "prometheus-client (>=0.7.1)", "aiohttp-cors", "tabulate", "tensorboardX (>=1.9)", "jsonschema", "scipy", "uvicorn", "kubernetes", "requests", "gym", "gpustat", "aiohttp", "urllib3", "dm-tree", "py-spy (>=0.2.0)", "pandas", "opentelemetry-api (==1.1.0)", "kopf", "matplotlib (!=3.4.3)", "opentelemetry-sdk (==1.1.0)", "fastapi", "colorful", "pyyaml", "opentelemetry-exporter-otlp (==1.1.0)", "lz4"]
 default = ["aiohttp", "aiohttp-cors", "aioredis (<2)", "colorful", "py-spy (>=0.2.0)", "jsonschema", "requests", "gpustat", "opencensus", "prometheus-client (>=0.7.1)"]
 k8s = ["kubernetes", "urllib3", "kopf"]
 observability = ["opentelemetry-api (==1.1.0)", "opentelemetry-sdk (==1.1.0)", "opentelemetry-exporter-otlp (==1.1.0)"]
@@ -1114,7 +1113,7 @@ tune = ["pandas", "tabulate", "tensorboardX (>=1.9)", "requests"]
 
 [package.source]
 type = "url"
-url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/cd22a7d1bbf38f66aa8b735459319ff24f102a20/ray-2.0.0.dev0-cp39-cp39-manylinux2014_x86_64.whl"
+url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp39-cp39-manylinux2014_x86_64.whl"
 [[package]]
 name = "redis"
 version = "3.5.3"
@@ -1411,7 +1410,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.1"
-content-hash = "77e59ba63c88b601e79bddfd9d9675b77367f6acbff2db6e199ab2815dbd6065"
+content-hash = "8496b7df4a4b60a43fe04bd4f68ea41be7abdb16c4cf05c9766acafc37e5ff31"
 
 [metadata.files]
 aiohttp = [
@@ -1539,8 +1538,8 @@ daemoniker = [
     {file = "daemoniker-0.2.3.tar.gz", hash = "sha256:d9b62c8d75227b3da88c0ca22b82e19d88d32dade4ffa838427235e0cdd5e578"},
 ]
 decorator = [
-    {file = "decorator-5.0.9-py3-none-any.whl", hash = "sha256:6e5c199c16f7a9f0e3a61a4a54b3d27e7dad0dbdde92b944426cb20914376323"},
-    {file = "decorator-5.0.9.tar.gz", hash = "sha256:72ecfba4320a893c53f9706bebb2d55c270c1e51a28789361aa93e4a21319ed5"},
+    {file = "decorator-5.1.0-py3-none-any.whl", hash = "sha256:7b12e7c3c6ab203a29e157335e9122cb03de9ab7264b137594103fd4a683b374"},
+    {file = "decorator-5.1.0.tar.gz", hash = "sha256:e59913af105b9860aa2c8d3272d9de5a56a4e608db9a2f167a8480b323d529a7"},
 ]
 dill = [
     {file = "dill-0.3.4-py2.py3-none-any.whl", hash = "sha256:7e40e4a70304fd9ceab3535d36e58791d9c4a776b38ec7f7ec9afc8d3dca4d4f"},
@@ -1913,11 +1912,11 @@ matplotlib-inline = [
     {file = "matplotlib_inline-0.1.3-py3-none-any.whl", hash = "sha256:aed605ba3b72462d64d475a21a9296f400a19c4f74a31b59103d2a99ffd5aa5c"},
 ]
 minerl = [
-    {file = "minerl-0.4.1a2.tar.gz", hash = "sha256:ddeff068c75d586d9b36cd839a611feabff594d9549d93c8bbdfad3bb5d1dd53"},
+    {file = "minerl-0.4.2.tar.gz", hash = "sha256:653d2fe1079e003736dccee09fd957570e238dce1ac411ffa3e2d342bafa4006"},
 ]
 minerl-wrappers = [
-    {file = "minerl-wrappers-0.1.4.tar.gz", hash = "sha256:e005ce75fcfe5fd345384635e692050848ffafe5a6b7e10e43073238c6522060"},
-    {file = "minerl_wrappers-0.1.4-py3-none-any.whl", hash = "sha256:7675201bb81347c94b67659dbd05f496b167a15ed6e7035953bbd5f641fcd7cf"},
+    {file = "minerl-wrappers-0.1.5.tar.gz", hash = "sha256:1ce39c8849061a244d98815fe6c4ff36d13cfa1782344d78601bb75d3ea23cec"},
+    {file = "minerl_wrappers-0.1.5-py3-none-any.whl", hash = "sha256:15246bbf96ba0f37188dd8c83c2810141ee5b178637b6b3716efc72c61d74598"},
 ]
 msgpack = [
     {file = "msgpack-1.0.2-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:b6d9e2dae081aa35c44af9c4298de4ee72991305503442a5c74656d82b581fe9"},
