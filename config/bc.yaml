@@ -1,5 +1,9 @@
-minerl-marwil:
-  run: MARWIL
+minerl-bc:
+  run: BC
+  stop:
+    time_total_s: 345600 # 4 days in seconds
+    # no sample limit since using offline rl
+    # info/num_steps_sampled: 8000000 # competition sample limit
   # check point file located results/experiment-name/unique-name/checkpoint_X/checkpoint-X
 #  checkpoint_freq: 1
   checkpoint_at_end: true
@@ -16,16 +20,11 @@ minerl-marwil:
       diamond: true
     input: minerl
     input_evaluation: [ ]
+    evaluation_interval: 10
+    evaluation_config:
+      input: sampler
     model:
       conv_filters: [ [ 64, 4, 4 ], [ 128, 4, 4 ], [ 256, 4, 4 ] ]
     framework: torch
     num_gpus: 1
     log_level: DEBUG
-    # marwil config
-    # In order to evaluate on an actual environment, use these following
-    # settings:
-#    evaluation_num_workers: 1
-#    evaluation_interval: 1
-#    evaluation_config:
-#      input: sampler
-    beta: 0

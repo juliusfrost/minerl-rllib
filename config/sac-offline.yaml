@@ -1,8 +1,9 @@
-minerl-sac:
+minerl-sac-offline:
     run: SAC
     stop:
       time_total_s: 345600 # 4 days in seconds
-      info/num_steps_sampled: 8000000 # competition sample limit
+      # no sample limit since using offline rl
+      # info/num_steps_sampled: 8000000 # competition sample limit
     # check point file located results/experiment-name/unique-name/checkpoint_X/checkpoint-X
 #    checkpoint_freq: 1
     checkpoint_at_end: true
