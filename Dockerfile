@@ -30,5 +30,7 @@ RUN python /minerl-rllib/tests/build_minerl.py
 COPY . /minerl-rllib
 
 FROM dependencies AS train
+# Installs the minerl-rllib package
+RUN poetry install --no-interaction --no-ansi
 #ENTRYPOINT ["python", "minerl_rllib/rllib_train.py"]
 #CMD ["-f bc.yaml"]
