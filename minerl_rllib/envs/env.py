@@ -85,10 +85,6 @@ class MineRLRandomDebugEnv(gym.Env):
         pass
 
 
-def wrap_env(env, **kwargs):
-    return wrap(env, **kwargs)
-
-
 def register_minerl_envs():
     for env_spec in (
         BASIC_ENV_SPECS + COMPETITION_ENV_SPECS + BASALT_COMPETITION_ENV_SPECS
@@ -96,7 +92,7 @@ def register_minerl_envs():
 
         def env_creator(env_config):
             with filelock.FileLock("minerl_env.lock"):
-                env = wrap_env(env_spec.make(), **env_config)
+                env = wrap(LazyMineRLEnv(env_spec), **env_config)
             return env
 
         register_env(env_spec.name, env_creator)
