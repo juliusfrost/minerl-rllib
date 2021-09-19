@@ -16,11 +16,13 @@ from ray.tune.registry import register_env
 from minerl_rllib.generate_kmeans import main as generate_kmeans
 
 
-class LazyMineRLEnv(gym.Env):
+class LazyMineRLEnv:
     def __init__(self, env_spec, **kwargs):
         self._kwargs = kwargs
         self.env_spec: EnvSpec = env_spec
         self._env = None
+        self.observation_space = self.env_spec.observation_space
+        self.action_space = self.env_spec.action_space
         super().__init__()
 
     def init_env(self):
@@ -30,7 +32,7 @@ class LazyMineRLEnv(gym.Env):
     def reset(self, **kwargs):
         if self._env is None:
             self.init_env()
-        return self._env.reset()
+        return self._env.reset(**kwargs)
 
     def step(self, action):
         return self._env.step(action)
