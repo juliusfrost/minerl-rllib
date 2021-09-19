@@ -11,7 +11,7 @@ from ray.rllib.utils.typing import SampleBatchType
 from ray.tune.registry import register_input
 
 from minerl_rllib.envs.data import MinerRLDataEnv
-from minerl_rllib.envs.env import wrap
+from minerl_rllib.envs.env import wrap_env
 from minerl_rllib.envs.utils import patch_data_pipeline
 
 
@@ -95,7 +95,7 @@ class MineRLInputReader(InputReader):
             seed=seed,
         )
         env = MinerRLDataEnv(self.data)
-        env = wrap(env, **env_config)
+        env = wrap_env(env, env_config, env_name)
         self.episode_generator = simulate_env_interaction(env)
         self.prep = get_preprocessor(env.observation_space)(env.observation_space)
 

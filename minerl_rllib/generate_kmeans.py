@@ -14,8 +14,8 @@ parser.add_argument("--data-dir", default=os.getenv("MINERL_DATA_ROOT", "data"))
 parser.add_argument("--overwrite", action="store_true")
 
 
-def main():
-    args = parser.parse_args()
+def main(args=None):
+    args = parser.parse_args(args=args)
     if args.env is None:
         env_list = []
         for env_name in os.listdir(args.data_dir):
@@ -24,11 +24,13 @@ def main():
     else:
         env_list = [args.env]
 
+    return_path = None
     for env_name in env_list:
         print(f"Generating {args.num_actions}-means for {env_name}")
 
         file_dir = os.path.join(args.data_dir, f"{args.num_actions}-means")
         file = os.path.join(file_dir, env_name + ".npy")
+        return_path = file
         if os.path.exists(file) and not args.overwrite:
             print(f"k-means file already exists at {file}")
             continue
@@ -50,6 +52,9 @@ def main():
         )
         print(kmeans)
         np.save(file, kmeans.cluster_centers_)
+
+    if len(env_list) == 1:
+        return return_path
 
 
 if __name__ == "__main__":

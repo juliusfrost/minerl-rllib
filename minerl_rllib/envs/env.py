@@ -1,3 +1,5 @@
+import os
+
 import filelock
 import gym
 import gym.wrappers
@@ -10,6 +12,8 @@ from minerl.herobraine.envs import (
 from minerl.herobraine.envs import MINERL_OBTAIN_DIAMOND_OBF_V0 as DEBUG_ENV_SPEC
 from minerl_wrappers import wrap
 from ray.tune.registry import register_env
+
+from minerl_rllib.generate_kmeans import main as generate_kmeans
 
 
 class LazyMineRLEnv(gym.Env):
@@ -85,14 +89,43 @@ class MineRLRandomDebugEnv(gym.Env):
         pass
 
 
+def wrap_env(env, env_config, env_name):
+    if env_config.get("kmeans", False):
+        # generate kmeans actions or load from data path if exists
+        # sets the minerl-wrappers config to use these action means
+        kmeans_config = env_config.get("kmeans_config", {})
+        args = [
+            "--env",
+            env_name,
+            "--num-actions",
+            str(kmeans_config.get("num_actions", 32)),
+            "--data-dir",
+            kmeans_config.get("data_dir", os.getenv("MINERL_DATA_ROOT", "data"))
+        ]
+        with filelock.FileLock("minerl_env.lock"):
+            means = generate_kmeans(args)
+        if env_config.get("diamond", False):
+            if "diamond_config" in env_config:
+                env_config["diamond_config"]["action_choices"] = means
+            else:
+                env_config["diamond_config"] = {"action_choices": means}
+        if env_config.get("pfrl_2020", False):
+            if "pfrl_2020_config" in env_config:
+                env_config["pfrl_2020_config"]["action_choices"] = means
+            else:
+                env_config["pfrl_2020_config"] = {"action_choices": means}
+    env = wrap(env, **env_config)
+    return env
+
+
 def register_minerl_envs():
     for env_spec in (
         BASIC_ENV_SPECS + COMPETITION_ENV_SPECS + BASALT_COMPETITION_ENV_SPECS
     ):
 
         def env_creator(env_config):
-            with filelock.FileLock("minerl_env.lock"):
-                env = wrap(LazyMineRLEnv(env_spec), **env_config)
+            env = LazyMineRLEnv(env_spec)
+            env = wrap_env(env, env_config, env_spec.name)
             return env
 
         register_env(env_spec.name, env_creator)

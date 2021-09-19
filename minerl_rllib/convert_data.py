@@ -8,7 +8,10 @@ from ray.tune.utils import merge_dicts
 
 from minerl_rllib.envs.data import write_jsons
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(
+    "This script is outdated. "
+    "Use the 'input: minerl' option to load the correct data automatically."
+)
 parser.add_argument(
     "--data-dir",
     type=str,
@@ -56,6 +59,11 @@ def get_save_path(data_dir, env_config, env_name=None):
 
 def main():
     args = parser.parse_args()
+
+    print(
+        "This script is outdated. "
+        "Use the 'input: minerl' option to load the correct data automatically."
+    )
 
     env_list = []
 
