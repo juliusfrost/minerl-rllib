@@ -18,6 +18,20 @@ from minerl_rllib.envs.utils import patch_data_pipeline
 def simulate_env_interaction(env, restart=True) -> SampleBatch:
     prep = get_preprocessor(env.observation_space)(env.observation_space)
     batch_builder = SampleBatchBuilder()
+
+    # get reverse action functions
+    env_ptr = env
+    reverse_action_fns = []
+    while hasattr(env_ptr, "env"):
+        if isinstance(env_ptr, gym.ActionWrapper):
+            reverse_action_fns.append(env_ptr.reverse_action)
+        env_ptr = env_ptr.env
+
+    def reverse_action(action):
+        for f in reversed(reverse_action_fns):
+            action = f(action)
+        return action
+
     while restart:
         for eps_id, trajectory_name in enumerate(env.trajectory_names):
             t = 0
@@ -31,7 +45,7 @@ def simulate_env_interaction(env, restart=True) -> SampleBatch:
             while not done:
                 new_obs, reward, done, info = env.step(env.action_space.sample())
                 action = info["action"]
-                action = env.reverse_action(action)
+                action = reverse_action(action)
                 if prev_action is None:
                     prev_action = np.zeros_like(action)
 
