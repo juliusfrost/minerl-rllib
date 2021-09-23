@@ -1,57 +1,59 @@
 minerl-sac-offline:
-    run: SAC
-    stop:
-      time_total_s: 345600 # 4 days in seconds
-      # no sample limit since using offline rl
-      # info/num_steps_sampled: 8000000 # competition sample limit
-    # check point file located results/experiment-name/unique-name/checkpoint_X/checkpoint-X
-#    checkpoint_freq: 1
-    checkpoint_at_end: true
-#    keep_checkpoints_num: 1 # keep the best checkpoint around
-#    checkpoint_score_attr: episode_reward_mean
-    # restore: path_to_checkpoint_file # does not restore the replay buffer so use with caution
-    local_dir: results # specifies the results folder
-    num_samples: 1 # number of random seeds to try
-    log_to_file: log.txt # useful for debugging with print statements, errors are logged to error.txt
-    config:
-        env: MineRLObtainDiamondVectorObf-v0
-        env_config:
-          diamond: true
-        input: minerl
-        input_evaluation: []
-        evaluation_interval: 10
-        evaluation_config:
-          input: sampler
-#        train_batch_size: 1
-        buffer_size: 50000
-        # SAC Configs
-        framework: torch
-        soft_horizon: False
-        horizon: 1000
-        Q_model:
-          conv_filters: [[64, 4, 4], [128, 4, 4], [256, 4, 4]]
-          fcnet_activation: relu
-          fcnet_hiddens: [ 256, 256, 256 ]
-        policy_model:
-          conv_filters: [[64, 4, 4], [128, 4, 4], [256, 4, 4]]
-          fcnet_activation: relu
-          fcnet_hiddens: [ 256, 256, 256 ]
-        tau: 0.005
-        target_entropy: auto
-        no_done_at_end: false
-        n_step: 1
-        rollout_fragment_length: 1
-        prioritized_replay: false
-        train_batch_size: 256
-        target_network_update_freq: 0
-        timesteps_per_iteration: 1000
-        learning_starts: 10
-        optimization:
-          actor_learning_rate: 0.0001
-          critic_learning_rate: 0.0003
-          entropy_learning_rate: 0.0001
-        num_workers: 0
-        num_gpus: 1
-        clip_actions: false
-        normalize_actions: true
-        metrics_smoothing_episodes: 5
+  run: SAC
+  stop:
+    time_total_s: 345600 # 4 days in seconds
+    # no sample limit since using offline rl
+    # info/num_steps_sampled: 8000000 # competition sample limit
+  # check point file located results/experiment-name/unique-name/checkpoint_X/checkpoint-X
+  checkpoint_freq: 1000
+  checkpoint_at_end: true
+  keep_checkpoints_num: 1 # keep the best checkpoint around
+  checkpoint_score_attr: eval/episode_reward_mean
+  # restore: path_to_checkpoint_file # does not restore the replay buffer so use with caution
+  local_dir: results # specifies the results folder
+  num_samples: 1 # number of random seeds to try
+  log_to_file: log.txt # useful for debugging with print statements, errors are logged to error.txt
+  config:
+    log_level: INFO
+    env: MineRLObtainDiamondVectorObf-v0
+    env_config:
+      diamond: true
+    input: minerl
+    input_evaluation: [ ]
+    evaluation_interval: 1000
+    evaluation_num_workers: 1
+    evaluation_parallel_to_training: true
+    evaluation_config:
+      input: sampler
+    buffer_size: 500000 # runs on 128 GB memory system
+    # SAC Configs
+    framework: torch
+    soft_horizon: False
+    horizon: 1000
+    Q_model:
+      conv_filters: [ [ 64, 4, 4 ], [ 128, 4, 4 ], [ 256, 4, 4 ] ]
+      fcnet_activation: relu
+      fcnet_hiddens: [ 256, 256, 256 ]
+    policy_model:
+      conv_filters: [ [ 64, 4, 4 ], [ 128, 4, 4 ], [ 256, 4, 4 ] ]
+      fcnet_activation: relu
+      fcnet_hiddens: [ 256, 256, 256 ]
+    tau: 0.005
+    target_entropy: auto
+    no_done_at_end: false
+    n_step: 1
+    rollout_fragment_length: 1
+    prioritized_replay: false
+    train_batch_size: 256
+    target_network_update_freq: 0
+    timesteps_per_iteration: 1000
+    learning_starts: 10
+    optimization:
+      actor_learning_rate: 0.0001
+      critic_learning_rate: 0.0003
+      entropy_learning_rate: 0.0001
+    num_workers: 0
+    num_gpus: 1
+    clip_actions: false
+    normalize_actions: true
+    metrics_smoothing_episodes: 5
