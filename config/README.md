@@ -4,8 +4,8 @@ All algorithm configs here are an MVP and not tuned. All of them do not obtain g
 
 `bc.yaml`: currently bugged because rllib
 
-`rainbow.yaml`: sometimes discovers rewarding episodes but data is too sparse to learn
+`rainbow.yaml`: sometimes discovers rewarding episodes but rewards are too sparse to learn
 
 `sac-discrete.yaml`: extremely slow to train
 
-`sac-offline.yaml`: Q function drastically overestimates values highlighted due to OOD actions
+`sac-offline.yaml`: Q function drastically overestimates values due to OOD actions
