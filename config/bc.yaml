@@ -5,26 +5,28 @@ minerl-bc:
     # no sample limit since using offline rl
     # info/num_steps_sampled: 8000000 # competition sample limit
   # check point file located results/experiment-name/unique-name/checkpoint_X/checkpoint-X
-#  checkpoint_freq: 1
+  checkpoint_freq: 1000
   checkpoint_at_end: true
-#  keep_checkpoints_num: 1 # keep the best checkpoint around
-#  checkpoint_score_attr: episode_reward_mean
+  keep_checkpoints_num: 1 # keep the best checkpoint around
+  checkpoint_score_attr: eval/episode_reward_mean
 #  restore: path_to_checkpoint_file # does not restore the replay buffer so use with caution
   local_dir: results # specifies the results folder
   num_samples: 1 # number of random seeds to try
   log_to_file: log.txt # useful for debugging with print statements, errors are logged to error.txt
   config:
+    log_level: INFO
     # minerl-rllib config changes
     env: MineRLObtainDiamondVectorObf-v0
     env_config:
       diamond: true
     input: minerl
     input_evaluation: [ ]
-    evaluation_interval: 10
+    evaluation_interval: 1000
+    evaluation_num_workers: 1
+    evaluation_parallel_to_training: true
     evaluation_config:
       input: sampler
     model:
       conv_filters: [ [ 64, 4, 4 ], [ 128, 4, 4 ], [ 256, 4, 4 ] ]
     framework: torch
     num_gpus: 1
-    log_level: DEBUG
