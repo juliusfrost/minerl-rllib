@@ -1,0 +1,74 @@
+# base hyperparameters used from sample efficient rainbow (Appendix F)
+# https://arxiv.org/abs/1906.05243
+minerl-rainbow:
+  run: DQN
+  stop:
+    time_total_s: 345600 # 4 days in seconds
+    info/num_steps_sampled: 8000000 # competition sample limit
+  local_dir: results # specifies the results folder
+  num_samples: 1 # number of random seeds to try
+  log_to_file: log.txt # useful for debugging with print statements, errors are logged to error.txt
+  checkpoint_freq: 1000
+  checkpoint_at_end: true
+  keep_checkpoints_num: 1 # keep the best checkpoint around
+  checkpoint_score_attr: eval/episode_reward_mean
+  config:
+    log_level: INFO
+    # MineRL config
+    env: MineRLObtainDiamondVectorObf-v0
+    env_config:
+      diamond: true
+#      diamond_config:
+#        gray_scale: true # (rainbow setting)
+#        frame_skip: 4 # (rainbow setting)
+#        frame_stack: 4 # (rainbow setting)
+      kmeans: true
+      kmeans_config:
+        num_actions: 30
+    framework: torch
+    # evaluation
+    evaluation_interval: 1000
+    evaluation_num_workers: 1
+    evaluation_parallel_to_training: true
+    evaluation_config:
+      input: sampler
+      explore: false
+    # Rainbow config
+    gamma: 0.99 # (rainbow setting)
+    num_atoms: 51  # (rainbow setting)
+    noisy: True  # (rainbow setting)
+    sigma0: 0.1 # (rainbow setting)
+    dueling: true # (rainbow setting)
+    hiddens: [ 256 ] # (sample-efficient rainbow setting)
+    double_q: true # (rainbow setting)
+    n_step: 20 # (sample-efficient rainbow setting)
+    model:
+      # Filter config. List of [out_channels, kernel, stride] for each filter
+      conv_filters: [ [ 64, 4, 4 ], [ 128, 4, 4 ], [ 256, 4, 4 ] ]
+      fcnet_hiddens: [ 256 ]
+      framestack: false
+    # exploration settings
+    exploration_config: # (default setting)
+      initial_epsilon: 1.0
+      final_epsilon: 0.02
+      epsilon_timesteps: 10000
+    # do a train op every step
+    timesteps_per_iteration: 1 # (sample-efficient rainbow setting)
+    target_network_update_freq: 2000 # (rainbow setting)
+    # optimization settings
+    lr: .0001 # (sample-efficient rainbow setting)
+    adam_epsilon: .00015 # (rainbow setting)
+    grad_clip: 10 # (rainbow setting)
+    learning_starts: 1600 # (sample-efficient rainbow setting)
+    rollout_fragment_length: 1 # (sample-efficient rainbow setting)
+    train_batch_size: 32 # (rainbow setting)
+    # replay buffer settings
+    # tweak this according to how much memory you have
+    buffer_size: 500000 # (rainbow setting)
+    replay_sequence_length: 1 # (sample-efficient rainbow setting)
+    prioritized_replay: True # (rainbow setting)
+    prioritized_replay_alpha: 0.5 # (rainbow setting)
+    prioritized_replay_beta: 0.4 # (rainbow setting)
+    final_prioritized_replay_beta: 1.0 # (rainbow setting)
+    prioritized_replay_beta_annealing_timesteps: 8000000 # set to the expected maximum number of time steps
+    num_gpus: 1
