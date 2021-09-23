@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "minerl-rllib"
+version = "0.1.0"
+description = "minerl-rllib is a reinforcement learning suite that benchmarks algorithms in RLLib on the MineRL environment."
+license = "GPL-3.0-only"
+authors = ["Julius Frost"]
+readme = "README.md"
+homepage = "https://github.com/juliusfrost/minerl-rllib/"
+repository = "https://github.com/juliusfrost/minerl-rllib/"
+
+[tool.poetry.dependencies]
+python = "^3.7.1"
+scikit-learn = "*"
+ray = [
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.9' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp39-cp39-manylinux2014_x86_64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.8' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp38-cp38-manylinux2014_x86_64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.7' and sys_platform == 'linux'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.9' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp39-cp39-win_amd64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.8' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp38-cp38-win_amd64.whl"},
+    {extras = ["default", "tune", "rllib"], markers = "python_version == '3.7' and sys_platform == 'win32'", url = "https://s3-us-west-2.amazonaws.com/ray-wheels/master/ea4a22249c7029fef1d7686e94ddde28c67ee5c8/ray-2.0.0.dev0-cp37-cp37m-win_amd64.whl"}
+]
+minerl-wrappers = "^0.1.6"
+tensorflow = "^2.6.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "DEBUG"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
