@@ -22,6 +22,8 @@ minerl-rainbow:
 #        gray_scale: true # (rainbow setting)
 #        frame_skip: 4 # (rainbow setting)
 #        frame_stack: 4 # (rainbow setting)
+      # This repo-exclusive API discretizes the action space by calculating the kmeans actions
+      # from the minerl dataset for the chosen env. Kmeans results are cached to data location.
       kmeans: true
       kmeans_config:
         num_actions: 30
